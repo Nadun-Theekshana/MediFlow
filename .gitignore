@@ -1,0 +1,31 @@
+# Environment files
+.env
+*.env
+
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build folders
+dist/
+client/dist/
+server/dist/
+build/
+
+# Editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary development files
+scratch/
+temp*.js
+testPrescriptions.js

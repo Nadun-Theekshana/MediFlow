@@ -1,0 +1,1984 @@
+/* src/styles/AdminDashboard.css */
+
+.admin-dashboard {
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+
+  display: grid;
+  grid-template-rows: 96px minmax(0, 1fr) 46px;
+
+  overflow: hidden;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #102454;
+
+  background:
+    radial-gradient(circle at 100% 0%, rgba(76, 155, 255, 0.14) 0, rgba(76, 155, 255, 0.14) 175px, transparent 176px),
+    linear-gradient(135deg, #ffffff 0%, #f8fbff 48%, #edf6ff 100%);
+}
+
+.admin-dashboard * {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.admin-header {
+  width: calc(100% - 68px);
+  height: 76px;
+  margin: 20px auto 0;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid #e2ecf8;
+  border-radius: 18px;
+
+
+}
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.admin-logo-icon {
+  width: 49px;
+  height: 49px;
+  fill: #137cf2;
+}
+
+.admin-logo-pulse {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.admin-wordmark {
+  color: #0b2057;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1.2px;
+}
+
+.admin-wordmark span {
+  color: #167df3;
+}
+
+/* =========================================================
+   NAV
+   ========================================================= */
+
+.admin-nav {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+}
+
+.admin-nav-btn {
+  height: 100%;
+  position: relative;
+  padding: 0 2px;
+  border: none;
+  background: transparent;
+  color: #536a91;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-nav-btn:hover {
+  color: #167df3;
+}
+
+.admin-nav-btn.active {
+  color: #071b52;
+  font-weight: 700;
+}
+
+.admin-nav-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  height: 3px;
+  border-radius: 20px;
+  background: #1684ff;
+}
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+.admin-logout-btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #ff4b3e, #f23231);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(240, 53, 49, 0.16);
+}
+
+.admin-logout-btn:hover {
+  transform:
+    translateY(-1px);
+}
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.admin-content {
+  width: 100%;
+  min-height: 0;
+  padding: 35px 5.2% 28px;
+  overflow: hidden;
+}
+
+/* =========================================================
+   HOME
+   ========================================================= */
+
+.admin-home {
+  width: 100%;
+  height: 100%;
+  max-width: 1460px;
+  margin: 0 auto;
+  display: flex;
+
+  flex-direction: column;
+}
+
+/* =========================================================
+   WELCOME
+   ========================================================= */
+
+.admin-welcome {
+  flex-shrink: 0;
+
+  margin-bottom: 32px;
+}
+
+.admin-welcome h2 {
+  margin: 0;
+
+  color: #07194d;
+
+  font-size: clamp(40px, 3.15vw, 54px);
+  line-height: 1.03;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+}
+
+.admin-welcome h2 span {
+  color: #07194d;
+}
+
+.admin-id {
+  margin:
+    14px 0 0;
+
+  color: #536d99;
+
+  font-size: 23px;
+
+  font-weight: 400;
+}
+
+/* =========================================================
+   CARD GRID
+   ========================================================= */
+
+.admin-card-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,
+      minmax(0, 1fr));
+
+  gap: 28px;
+}
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.admin-management-card {
+  width: 100%;
+
+  height: 330px;
+
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  padding:
+    30px 34px;
+
+  text-align: left;
+
+  background:
+    rgba(255, 255, 255, 0.97);
+
+  border:
+    1px solid #d8e8f8;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 9px 27px rgba(34, 79, 129, 0.08);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.admin-management-card:hover {
+  transform:
+    translateY(-4px);
+
+  border-color:
+    #a8d0ff;
+
+  box-shadow:
+    0 15px 34px rgba(34, 79, 129, 0.13);
+}
+
+/* =========================================================
+   CARD ICON
+   ========================================================= */
+
+.admin-card-icon {
+  width: 82px;
+  height: 82px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  margin-bottom: 23px;
+
+  border-radius: 50%;
+
+  background:
+    #e9f4ff;
+}
+
+.admin-card-icon svg {
+  width: 49px;
+  height: 49px;
+
+  fill: #137af0;
+
+  stroke: #137af0;
+
+  stroke-width: 2.4;
+}
+
+.admin-card-icon .doctor-stethoscope {
+  fill: none;
+
+  stroke: #137af0;
+
+  stroke-width: 3;
+
+  stroke-linecap: round;
+}
+
+/* =========================================================
+   CARD TEXT
+   ========================================================= */
+
+.admin-management-card h3 {
+  margin:
+    0 0 13px;
+
+  color: #05184f;
+
+  font-size: 25px;
+
+  line-height: 1.15;
+
+  font-weight: 800;
+}
+
+.admin-management-card p {
+  max-width: 330px;
+
+  margin: 0;
+
+  color: #526e9a;
+
+  font-size: 17px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   CARD ARROW
+   ========================================================= */
+
+.admin-card-arrow {
+  width: 45px;
+  height: 45px;
+
+  position: absolute;
+
+  right: 28px;
+
+  bottom: 26px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    #e9f4ff;
+}
+
+.admin-card-arrow svg {
+  width: 25px;
+  height: 25px;
+
+  fill: none;
+
+  stroke: #137af0;
+
+  stroke-width: 2.6;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+}
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+.admin-message {
+  position: fixed;
+
+  z-index: 100;
+
+  top: 105px;
+
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  width:
+    min(600px,
+      calc(100% - 40px));
+
+  padding:
+    11px 15px;
+
+  border-radius: 8px;
+
+  text-align: center;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+.admin-message.success {
+  color: #166534;
+
+  background: #ecfdf3;
+
+  border:
+    1px solid #b8ebcb;
+}
+
+.admin-message.error {
+  color: #b42318;
+
+  background: #fff1f0;
+
+  border:
+    1px solid #ffc9c5;
+}
+
+/* =========================================================
+   INNER PAGES
+   ========================================================= */
+
+.admin-page-section {
+  width:
+    min(760px,
+      100%);
+
+  margin: 0 auto;
+}
+
+.admin-section-heading {
+  margin-bottom: 20px;
+}
+
+.admin-section-heading>p {
+  margin:
+    0 0 4px;
+
+  color: #1679ef;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.8px;
+}
+
+.admin-section-heading h2 {
+  margin:
+    0 0 6px;
+
+  color: #10244e;
+
+  font-size: 31px;
+}
+
+.admin-section-heading span {
+  color: #70819b;
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.admin-form {
+  width:
+    min(570px,
+      100%);
+
+  padding: 27px;
+
+  background:
+    #ffffff;
+
+  border:
+    1px solid #dce8f5;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 9px 25px rgba(31, 75, 120, 0.08);
+}
+
+.admin-form-group {
+  display: flex;
+
+  flex-direction: column;
+
+  margin-bottom: 15px;
+}
+
+.admin-form-group label {
+  margin-bottom: 6px;
+
+  color: #2c4266;
+
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+.admin-form-group input {
+  width: 100%;
+
+  padding:
+    10px 12px;
+
+  outline: none;
+
+  color: #253b5e;
+
+  background:
+    #fbfdff;
+
+  border:
+    1px solid #cad9e9;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+}
+
+.admin-form-group input:focus {
+  border-color:
+    #1679ef;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 121, 239, 0.11);
+}
+
+/* Search input */
+.admin-search-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px 12px;
+  margin: 12px 0;
+  border: 1px solid #cad9e9;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  color: #253b5e;
+  background: #fbfdff;
+}
+
+.admin-search-input:focus {
+  border-color: #1679ef;
+  box-shadow: 0 0 0 3px rgba(22, 121, 239, 0.11);
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.status-badge.active {
+  background-color: #28a745;
+}
+
+.status-badge.inactive {
+  background-color: #dc3545;
+}
+
+/* Action button */
+.admin-action-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #1679ef;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.admin-action-btn:hover {
+  background-color: #096ad7;
+}
+
+
+.admin-primary-btn {
+  padding:
+    11px 20px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background:
+    #1679ef;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.admin-primary-btn:hover:not(:disabled) {
+  background:
+    #096ad7;
+}
+
+.admin-primary-btn:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   ADMIN OVERVIEW
+   ========================================================= */
+
+.admin-overview-card {
+  display: grid;
+
+  grid-template-columns:
+    110px 1fr;
+
+  gap: 28px;
+
+  align-items: center;
+
+  padding: 28px;
+
+  background:
+    #ffffff;
+
+  border:
+    1px solid #dce8f5;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 9px 25px rgba(35, 78, 125, 0.07);
+}
+
+.overview-icon {
+  width: 90px;
+  height: 90px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    #eaf4ff;
+}
+
+.overview-icon svg {
+  width: 53px;
+  height: 53px;
+
+  fill: #1679ef;
+}
+
+.overview-row {
+  display: grid;
+
+  grid-template-columns:
+    110px 1fr;
+
+  gap: 17px;
+
+  padding:
+    11px 0;
+
+  border-bottom:
+    1px solid #edf2f7;
+
+  font-size: 14px;
+}
+
+.overview-row:last-child {
+  border-bottom: none;
+}
+
+.overview-row span {
+  color: #8090a8;
+}
+
+.overview-row strong {
+  color: #20365c;
+}
+
+.admin-quick-actions {
+  display: flex;
+
+  gap: 12px;
+
+  margin-top: 18px;
+}
+
+.admin-quick-actions button {
+  padding:
+    10px 18px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background:
+    #1679ef;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.admin-footer {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #526d98;
+
+  background:
+    rgba(222, 239, 255, 0.85);
+
+  border-top:
+    1px solid #d8e8f7;
+
+  font-size: 13px;
+}
+
+/* =========================================================
+   UNAUTHORIZED
+   ========================================================= */
+
+.admin-unauthorized {
+  width: 100%;
+
+  min-height: 100vh;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    #f5f9ff;
+
+  color: #14284d;
+}
+
+/* =========================================================
+   LAPTOP HEIGHT
+   ========================================================= */
+
+@media (min-width: 1001px) and (max-height: 800px) {
+
+  .admin-dashboard {
+    grid-template-rows:
+      82px minmax(0, 1fr) 38px;
+  }
+
+  .admin-header {
+    height: 66px;
+
+    margin-top: 14px;
+
+    padding:
+      0 30px;
+  }
+
+  .admin-logo-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .admin-wordmark {
+    font-size: 27px;
+  }
+
+  .admin-nav {
+    gap: 35px;
+  }
+
+  .admin-nav-btn {
+    font-size: 14px;
+  }
+
+  .admin-nav-btn.active::after {
+    bottom: 10px;
+  }
+
+  .admin-logout-btn {
+    padding:
+      9px 19px;
+
+    font-size: 14px;
+  }
+
+  .admin-content {
+    padding:
+      22px 5% 18px;
+  }
+
+  .admin-welcome {
+    margin-bottom: 18px;
+  }
+
+  .admin-welcome h2 {
+    font-size: 35px;
+  }
+
+  .admin-id {
+    margin-top: 7px;
+
+    font-size: 17px;
+  }
+
+  .admin-card-grid {
+    gap: 20px;
+  }
+
+  .admin-management-card {
+    height: 270px;
+
+    padding:
+      21px 24px;
+  }
+
+  .admin-card-icon {
+    width: 60px;
+    height: 60px;
+
+    margin-bottom: 14px;
+  }
+
+  .admin-card-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .admin-management-card h3 {
+    margin-bottom: 9px;
+
+    font-size: 21px;
+  }
+
+  .admin-management-card p {
+    font-size: 14px;
+
+    line-height: 1.4;
+  }
+
+  .admin-card-arrow {
+    width: 35px;
+    height: 35px;
+
+    right: 18px;
+
+    bottom: 18px;
+  }
+
+  .admin-card-arrow svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .admin-footer {
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .admin-dashboard {
+    height: auto;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: visible;
+  }
+
+  .admin-header {
+    width:
+      calc(100% - 30px);
+
+    height: auto;
+
+    margin:
+      15px auto 0;
+
+    padding:
+      16px 22px;
+
+    grid-template-columns:
+      auto auto;
+
+    gap: 16px;
+  }
+
+  .admin-nav {
+    grid-column:
+      1 / -1;
+
+    grid-row: 2;
+
+    justify-content:
+      flex-start;
+
+    gap: 20px;
+
+    overflow-x: auto;
+  }
+
+  .admin-nav-btn {
+    padding:
+      8px 3px 15px;
+
+    white-space: nowrap;
+  }
+
+  .admin-nav-btn.active::after {
+    bottom: 5px;
+  }
+
+  .admin-logout-btn {
+    justify-self: end;
+  }
+
+  .admin-content {
+    overflow: visible;
+
+    padding:
+      40px 30px 50px;
+  }
+
+  .admin-home {
+    height: auto;
+  }
+
+  .admin-card-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .admin-management-card {
+    height: auto;
+
+    min-height: 260px;
+  }
+
+  .admin-footer {
+    padding:
+      14px 20px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .admin-header {
+    width:
+      calc(100% - 20px);
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    padding:
+      14px 16px;
+  }
+
+  .admin-logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .admin-wordmark {
+    font-size: 24px;
+  }
+
+  .admin-nav {
+    width: 100%;
+
+    order: 3;
+
+    justify-content:
+      space-between;
+
+    gap: 6px;
+  }
+
+  .admin-nav-btn {
+    font-size: 12px;
+  }
+
+  .admin-logout-btn {
+    margin-left: auto;
+
+    padding:
+      8px 14px;
+
+    font-size: 12px;
+  }
+
+  .admin-content {
+    padding:
+      30px 18px 40px;
+  }
+
+  .admin-welcome h2 {
+    font-size: 31px;
+  }
+
+  .admin-id {
+    font-size: 17px;
+  }
+
+  .admin-management-card {
+    min-height: 235px;
+
+    padding: 23px;
+  }
+
+  .admin-form {
+    padding: 22px;
+  }
+
+  .admin-overview-card {
+    grid-template-columns:
+      1ff;
+
+    text-align: center;
+  }
+
+  .overview-icon {
+    margin:
+      0 auto;
+
+  }
+
+  .overview-row {
+    grid-template-columns:
+      1ff;
+
+    gap: 4px;
+
+    text-align: left;
+  }
+
+  .admin-quick-actions {
+    flex-direction: column;
+  }
+}
+
+/* =========================================================
+   DOCTOR ACCOUNT MANAGEMENT
+   SAMPLE 4 - TABLE WITH STATUS
+   Append this block at the END of AdminDashboard.css
+   ========================================================= */
+
+/* =========================================================
+   PAGE WIDTH
+   ========================================================= */
+
+.admin-page-section.doctor-management-page {
+  width: min(1180px, 100%);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   PAGE HEADING
+   ========================================================= */
+
+.doctor-management-page .admin-section-heading {
+  margin-bottom: 28px;
+}
+
+.doctor-management-page .admin-section-heading > p {
+  margin: 0 0 7px;
+
+  color: #147cf3;
+
+  font-size: 12px;
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  text-transform: uppercase;
+}
+
+.doctor-management-page .admin-section-heading h2 {
+  margin: 0 0 8px;
+
+  color: #0b1f58;
+
+  font-size: clamp(31px, 2.4vw, 40px);
+  line-height: 1.08;
+
+  font-weight: 800;
+
+  letter-spacing: -0.8px;
+}
+
+.doctor-management-page .admin-section-heading span {
+  color: #687da4;
+
+  font-size: 16px;
+  line-height: 1.4;
+
+  font-weight: 400;
+}
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.doctor-management-toolbar {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 14px;
+}
+
+/* =========================================================
+   ADD DOCTOR BUTTON
+   ========================================================= */
+
+.doctor-add-btn {
+  min-width: 135px;
+  height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 20px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: linear-gradient(
+    135deg,
+    #1684ff 0%,
+    #0877ef 100%
+  );
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 14px rgba(22, 126, 243, 0.18);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.doctor-add-btn:hover {
+  transform: translateY(-1px);
+
+  background: linear-gradient(
+    135deg,
+    #087cf4 0%,
+    #056cdf 100%
+  );
+
+  box-shadow:
+    0 7px 18px rgba(22, 126, 243, 0.24);
+}
+
+.doctor-add-btn:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   SEARCH BOX
+   ========================================================= */
+
+.doctor-search-wrapper {
+  width: 360px;
+  max-width: 100%;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 15px;
+
+  background: #ffffff;
+
+  border: 1px solid #d7e6f5;
+  border-radius: 9px;
+
+  box-shadow:
+    0 4px 14px rgba(50, 90, 135, 0.05);
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.doctor-search-wrapper:focus-within {
+  border-color: #8fc4ff;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 126, 243, 0.08);
+}
+
+.doctor-search-wrapper svg {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+
+  fill: none;
+
+  stroke: #6682ac;
+  stroke-width: 2;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.doctor-search-input {
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #183462;
+
+  font-family: inherit;
+
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.doctor-search-input::placeholder {
+  color: #8395b3;
+}
+
+/* =========================================================
+   TABLE CARD
+   ========================================================= */
+
+.doctor-table-card {
+  width: 100%;
+
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.98);
+
+  border: 1px solid #d8e9f8;
+
+  border-radius: 15px;
+
+  box-shadow:
+    0 9px 27px rgba(44, 87, 132, 0.07);
+}
+
+.doctor-table-scroll {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.doctor-management-table {
+  width: 100%;
+
+  min-width: 850px;
+
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  table-layout: auto;
+}
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.doctor-management-table thead {
+  background: linear-gradient(
+    90deg,
+    #eef7ff 0%,
+    #e6f2ff 100%
+  );
+}
+
+.doctor-management-table thead tr {
+  height: 49px;
+}
+
+.doctor-management-table th {
+  padding: 0 18px;
+
+  vertical-align: middle;
+
+  text-align: left;
+
+  color: #17366c;
+
+  font-size: 11px;
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: 0.65px;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+
+  border-bottom:
+    1px solid #d8e8f7;
+}
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.doctor-management-table tbody tr {
+  height: 58px;
+
+  background: #ffffff;
+
+  transition:
+    background 0.16s ease;
+}
+
+.doctor-management-table tbody tr:hover {
+  background: #fbfdff;
+}
+
+.doctor-management-table td {
+  padding: 0 18px;
+
+  vertical-align: middle;
+
+  color: #344e78;
+
+  font-size: 14px;
+  line-height: 1.35;
+
+  font-weight: 400;
+
+  border-bottom:
+    1px solid #e8f0f8;
+}
+
+.doctor-management-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =========================================================
+   COLUMN 1 - NUMBER
+   ========================================================= */
+
+.doctor-management-table th:nth-child(1),
+.doctor-management-table td:nth-child(1) {
+  width: 65px;
+
+  text-align: center;
+}
+
+.doctor-management-table td:nth-child(1) {
+  color: #7187a8;
+}
+
+/* =========================================================
+   COLUMN 2 - DOCTOR ID
+   ========================================================= */
+
+.doctor-management-table th:nth-child(2),
+.doctor-management-table td:nth-child(2) {
+  width: 145px;
+}
+
+.doctor-management-table td:nth-child(2) {
+  color: #10275e;
+
+  font-weight: 700;
+}
+
+/* =========================================================
+   COLUMN 3 - NAME
+   ========================================================= */
+
+.doctor-management-table th:nth-child(3),
+.doctor-management-table td:nth-child(3) {
+  width: 200px;
+}
+
+.doctor-management-table td:nth-child(3) {
+  color: #294675;
+
+  font-weight: 500;
+}
+
+/* =========================================================
+   COLUMN 4 - EMAIL
+   ========================================================= */
+
+.doctor-management-table th:nth-child(4),
+.doctor-management-table td:nth-child(4) {
+  min-width: 280px;
+}
+
+/* =========================================================
+   COLUMN 5 - ROLE
+   ========================================================= */
+
+.doctor-management-table th:nth-child(5),
+.doctor-management-table td:nth-child(5) {
+  width: 150px;
+}
+
+/* =========================================================
+   COLUMN 6 - STATUS
+   ========================================================= */
+
+.doctor-management-table th:nth-child(6),
+.doctor-management-table td:nth-child(6) {
+  width: 170px;
+
+  text-align: center;
+}
+
+/* =========================================================
+   STATUS PILL
+   ========================================================= */
+
+.doctor-status-pill {
+  min-width: 86px;
+  height: 28px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 12px;
+
+  border: 1px solid transparent;
+
+  border-radius: 999px;
+
+  font-family: inherit;
+
+  font-size: 12px;
+  line-height: 1;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+/* =========================================================
+   ACTIVE STATUS
+   ========================================================= */
+
+.doctor-status-pill.is-active {
+  color: #078447;
+
+  background: #dcf8e9;
+
+  border-color: #d0f2df;
+}
+
+.doctor-status-pill.is-active:hover {
+  background: #cef3dd;
+
+  box-shadow:
+    0 4px 10px rgba(31, 169, 97, 0.12);
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   INACTIVE STATUS
+   ========================================================= */
+
+.doctor-status-pill.is-inactive {
+  color: #ef3f43;
+
+  background: #ffe8e8;
+
+  border-color: #ffd9da;
+}
+
+.doctor-status-pill.is-inactive:hover {
+  background: #ffdddd;
+
+  box-shadow:
+    0 4px 10px rgba(239, 63, 67, 0.10);
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   STATUS DOT
+   ========================================================= */
+
+.doctor-status-dot {
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+.doctor-status-pill.is-active
+.doctor-status-dot {
+  background: #13ad61;
+}
+
+.doctor-status-pill.is-inactive
+.doctor-status-dot {
+  background: #ff4b50;
+}
+
+/* =========================================================
+   STATUS UPDATING
+   ========================================================= */
+
+.doctor-status-pill:disabled {
+  opacity: 0.65;
+
+  cursor: wait;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+/* =========================================================
+   EMPTY TABLE
+   ========================================================= */
+
+.doctor-empty-row {
+  height: 90px !important;
+}
+
+.doctor-management-table
+.doctor-empty-row td {
+  text-align: center !important;
+
+  color: #7185a4 !important;
+
+  font-size: 14px !important;
+
+  font-weight: 500 !important;
+}
+
+/* =========================================================
+   TABLE FOOTER
+   ========================================================= */
+
+.doctor-table-footer {
+  width: 100%;
+
+  min-height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding: 0 18px;
+
+  color: #657da4;
+
+  background: #ffffff;
+
+  border-top:
+    1px solid #e4eef8;
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  font-weight: 400;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.doctor-table-scroll::-webkit-scrollbar {
+  height: 7px;
+}
+
+.doctor-table-scroll::-webkit-scrollbar-track {
+  background: #f3f8fd;
+}
+
+.doctor-table-scroll::-webkit-scrollbar-thumb {
+  background: #c6d8eb;
+
+  border-radius: 999px;
+}
+
+.doctor-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a9c4df;
+}
+
+/* =========================================================
+   LAPTOP HEIGHT
+   ========================================================= */
+
+@media (min-width: 1001px) and (max-height: 800px) {
+
+  .admin-page-section.doctor-management-page {
+    max-width: 1080px;
+  }
+
+  .doctor-management-page
+  .admin-section-heading {
+    margin-bottom: 20px;
+  }
+
+  .doctor-management-page
+  .admin-section-heading h2 {
+    font-size: 31px;
+  }
+
+  .doctor-management-page
+  .admin-section-heading span {
+    font-size: 14px;
+  }
+
+  .doctor-management-toolbar {
+    margin-bottom: 10px;
+  }
+
+  .doctor-add-btn,
+  .doctor-search-wrapper {
+    height: 40px;
+  }
+
+  .doctor-management-table thead tr {
+    height: 42px;
+  }
+
+  .doctor-management-table tbody tr {
+    height: 49px;
+  }
+
+  .doctor-table-footer {
+    min-height: 43px;
+  }
+
+  .doctor-status-pill {
+    height: 25px;
+
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .admin-page-section.doctor-management-page {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .doctor-management-toolbar {
+    gap: 16px;
+  }
+
+  .doctor-search-wrapper {
+    width: min(340px, 100%);
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .doctor-management-page
+  .admin-section-heading {
+    margin-bottom: 22px;
+  }
+
+  .doctor-management-page
+  .admin-section-heading h2 {
+    font-size: 28px;
+  }
+
+  .doctor-management-page
+  .admin-section-heading span {
+    font-size: 14px;
+  }
+
+  .doctor-management-toolbar {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 12px;
+  }
+
+  .doctor-add-btn {
+    width: 100%;
+  }
+
+  .doctor-search-wrapper {
+    width: 100%;
+
+    max-width: none;
+  }
+
+  .doctor-table-card {
+    border-radius: 12px;
+  }
+
+  .doctor-management-table {
+    min-width: 820px;
+  }
+}
+
+/* =========================================================
+   ADD DOCTOR - CONSULTANT TYPE DROPDOWN
+   Match existing form inputs
+   ========================================================= */
+
+.admin-form-group select#doctor-specialization,
+.admin-form-group select[name="specialization"] {
+  width: 100% !important;
+  height: 50px !important;
+
+  padding: 0 44px 0 14px !important;
+
+  margin: 0 !important;
+
+  color: #253b5e !important;
+
+  background-color: #fbfdff !important;
+
+  border: 1px solid #cad9e9 !important;
+  border-radius: 10px !important;
+
+  outline: none !important;
+
+  font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+
+  cursor: pointer !important;
+
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #7085a5 50%
+    ),
+    linear-gradient(
+      135deg,
+      #7085a5 50%,
+      transparent 50%
+    ) !important;
+
+  background-position:
+    calc(100% - 19px) 21px,
+    calc(100% - 14px) 21px !important;
+
+  background-size:
+    5px 5px,
+    5px 5px !important;
+
+  background-repeat: no-repeat !important;
+
+  box-shadow: none !important;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease !important;
+}
+
+/* Placeholder / first option appearance */
+
+.admin-form-group select#doctor-specialization:invalid,
+.admin-form-group select[name="specialization"]:invalid {
+  color: #7b8ba4 !important;
+}
+
+/* Hover */
+
+.admin-form-group select#doctor-specialization:hover,
+.admin-form-group select[name="specialization"]:hover {
+  border-color: #b4c9e0 !important;
+}
+
+/* Focus - same style as existing text inputs */
+
+.admin-form-group select#doctor-specialization:focus,
+.admin-form-group select[name="specialization"]:focus {
+  border-color: #1679ef !important;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 121, 239, 0.11) !important;
+
+  background-color: #ffffff !important;
+}
+
+/* Dropdown option appearance */
+
+.admin-form-group select#doctor-specialization option,
+.admin-form-group select[name="specialization"] option {
+  color: #253b5e !important;
+  background: #ffffff !important;
+
+  font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+  font-size: 14px !important;
+}
+
+/* First disabled option */
+
+.admin-form-group select#doctor-specialization option[value=""],
+.admin-form-group select[name="specialization"] option[value=""] {
+  color: #7b8ba4 !important;
+}
+
+/* =========================================================
+   DOCTOR ACCOUNT MANAGEMENT - DELETE
+   ========================================================= */
+
+.doctor-management-table th:nth-child(7),
+.doctor-management-table td:nth-child(7) {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+}
+
+.doctor-delete-btn {
+  min-width: 74px;
+  height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 13px;
+
+  border: 1px solid #ffd0d0;
+  border-radius: 7px;
+
+  background: #fff0f0;
+
+  color: #e23c3c;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.doctor-delete-btn:hover:not(:disabled) {
+  background: #ffe2e2;
+  border-color: #ffbcbc;
+
+  box-shadow:
+    0 3px 9px rgba(225, 58, 58, 0.08);
+
+  transform: translateY(-1px);
+}
+
+.doctor-delete-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.doctor-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+
+.doctor-management-table {
+  min-width: 980px;
+}
