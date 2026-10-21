@@ -1117,3 +1117,53 @@
     gap: 4px;
   }
 }
+
+/* ==========================================================================
+   APPOINTMENT SELECT DROPDOWNS
+   ========================================================================== */
+
+.patient-appointment-select {
+  width: 100%;
+  min-height: 56px;
+
+  padding: 0 44px 0 16px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #cbdced;
+  border-radius: 10px;
+
+  outline: none;
+
+  background-color: #fbfdff;
+
+  color: #20395f;
+
+  font-family: inherit;
+  font-size: 15px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.patient-appointment-select:focus {
+  border-color: #2584ee;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(37, 132, 238, 0.10);
+
+  background-color: #ffffff;
+}
+
+.patient-appointment-select:disabled {
+  color: #8999ae;
+
+  background-color: #f3f6fa;
+
+  cursor: not-allowed;
+}

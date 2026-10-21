@@ -72,15 +72,45 @@ const createUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const AVAILABILITY_DAYS = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ];
+
+    const AVAILABILITY_TIMES = [
+      '09:00',
+      '10:30',
+      '13:30',
+      '15:00'
+    ];
+
+    let doctorSchedule = {};
+    if (role === 'doctor') {
+      const number = parseInt(String(userId).replace(/\D/g, ''), 10) || 1;
+      const dayIndex = (number - 1) % AVAILABILITY_DAYS.length;
+      const timeIndex = Math.floor((number - 1) / AVAILABILITY_DAYS.length) % AVAILABILITY_TIMES.length;
+      doctorSchedule = {
+        availabilityDay: AVAILABILITY_DAYS[dayIndex],
+        availabilityTime: AVAILABILITY_TIMES[timeIndex]
+      };
+    }
+
     const newUser = new User({
       userId,
       name,
       email,
       password: hashedPassword,
       role,
+      isActive: true,
       isConsultant: isConsultant || false,
       consultantType: consultantType || '',
-      specialization: role === 'doctor' ? specialization : undefined
+      specialization: role === 'doctor' ? specialization : undefined,
+      availabilityDay: role === 'doctor' ? doctorSchedule.availabilityDay : undefined,
+      availabilityTime: role === 'doctor' ? doctorSchedule.availabilityTime : undefined
     });
 
     await newUser.save();
@@ -111,33 +141,45 @@ const getDoctors = async (req, res) => {
   }
 };
 
+// LIST PATIENTS (admin view)
+const getPatients = async (req, res) => {
+  try {
+    const patients = await User.find({ role: 'patient' })
+      .select('userId name email role isActive createdAt')
+      .sort({ createdAt: -1 });
+    return res.status(200).json({ patients });
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to fetch Patient accounts.' });
+  }
+};
+
 // UPDATE DOCTOR STATUS (admin only)
 const updateDoctorStatus = async (req, res) => {
-    const { userId } = req.params;
-    const { isActive } = req.body;
-    if (typeof isActive !== 'boolean') {
-        return res.status(400).json({ message: 'isActive must be a boolean.' });
+  const { userId } = req.params;
+  const { isActive } = req.body;
+  if (typeof isActive !== 'boolean') {
+    return res.status(400).json({ message: 'isActive must be a boolean.' });
+  }
+  try {
+    const doctor = await User.findOne({ userId, role: 'doctor' });
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found.' });
     }
-    try {
-        const doctor = await User.findOne({ userId, role: 'doctor' });
-        if (!doctor) {
-            return res.status(404).json({ message: 'Doctor not found.' });
-        }
-        doctor.isActive = isActive;
-        await doctor.save();
-        res.json({
-            message: 'Doctor account status updated successfully.',
-            doctor: {
-                userId: doctor.userId,
-                name: doctor.name,
-                email: doctor.email,
-                role: doctor.role,
-                isActive: doctor.isActive
-            }
-        });
-    } catch (e) {
-        res.status(500).json({ message: 'Server error', error: e.message });
-    }
+    doctor.isActive = isActive;
+    await doctor.save();
+    res.json({
+      message: 'Doctor account status updated successfully.',
+      doctor: {
+        userId: doctor.userId,
+        name: doctor.name,
+        email: doctor.email,
+        role: doctor.role,
+        isActive: doctor.isActive
+      }
+    });
+  } catch (e) {
+    res.status(500).json({ message: 'Server error', error: e.message });
+  }
 };
 
 // DELETE DOCTOR
@@ -184,10 +226,62 @@ const updateDoctor = async (req, res) => {
   }
 };
 
+// DELETE PATIENT
+const deletePatient = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const patient = await User.findOne({
+      userId,
+      role: 'patient'
+    });
+
+    if (!patient) {
+      return res.status(404).json({
+        message: 'Patient account not found.'
+      });
+    }
+
+    await User.deleteOne({
+      userId,
+      role: 'patient'
+    });
+
+    return res.status(200).json({
+      message: 'Patient account deleted successfully.'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Unable to delete Patient account.'
+    });
+  }
+};
+
+// GET APPOINTMENT DOCTORS (patient view)
+const getAppointmentDoctors = async (req, res) => {
+  try {
+    const doctors = await User.find({
+      role: 'doctor',
+      isActive: { $ne: false }
+    })
+      .select('userId name specialization availabilityDay availabilityTime')
+      .sort({ specialization: 1, name: 1 });
+
+    return res.status(200).json({ doctors });
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to fetch appointment doctors.' });
+  }
+};
+
 module.exports = {
   createUser,
   getDoctors,
+  getPatients,
+  getAppointmentDoctors,
   deleteDoctor,
+  deletePatient,
   updateDoctor,
   updateDoctorStatus,
 };
+
+

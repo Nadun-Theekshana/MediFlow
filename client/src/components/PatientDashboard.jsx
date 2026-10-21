@@ -3,6 +3,75 @@
 import { useEffect, useState } from 'react';
 import '../styles/PatientDashboard.css';
 
+const CONSULTANT_TYPES = [
+  'Consultant Physician / Internal Medicine',
+  'Cardiologist',
+  'Neurologist',
+  'Dermatologist',
+  'Endocrinologist',
+  'Gastroenterologist',
+  'Nephrologist',
+  'Pulmonologist / Respiratory Physician',
+  'Oncologist',
+  'General Surgeon',
+  'Orthopaedic Surgeon',
+  'ENT Surgeon',
+  'Ophthalmologist',
+  'Obstetrician & Gynaecologist',
+  'Paediatrician',
+  'Psychiatrist',
+  'Anaesthetist',
+  'Radiologist',
+  'Urologist',
+];
+
+const DAY_MAP = {
+  Sunday: 0,
+  Monday: 1,
+  Tuesday: 2,
+  Wednesday: 3,
+  Thursday: 4,
+  Friday: 5,
+  Saturday: 6,
+};
+
+function buildNextDoctorSlot(dayName, time) {
+  if (!dayName || !time) {
+    return null;
+  }
+
+  const now = new Date();
+  const targetDay = DAY_MAP[dayName];
+  const [hours, minutes] = time.split(':').map(Number);
+  const slot = new Date(now);
+
+  let daysAhead = (targetDay - now.getDay() + 7) % 7;
+  slot.setDate(now.getDate() + daysAhead);
+  slot.setHours(hours, minutes, 0, 0);
+
+  if (slot <= now) {
+    slot.setDate(slot.getDate() + 7);
+  }
+
+  return slot;
+}
+
+function formatSlotDisplay(slotDate) {
+  if (!slotDate) return '';
+  const dateStr = slotDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const timeStr = slotDate.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+  return `${dateStr} - ${timeStr}`;
+}
+
 export default function PatientDashboard({ user, onLogout }) {
   // ---------------------------------------------------------------------------
   // STATE
@@ -10,8 +79,10 @@ export default function PatientDashboard({ user, onLogout }) {
 
   const [view, setView] = useState('home');
 
-  const [doctorId, setDoctorId] = useState('');
-  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentDoctors, setAppointmentDoctors] = useState([]);
+  const [selectedSpecialization, setSelectedSpecialization] = useState('');
+  const [selectedDoctorUserId, setSelectedDoctorUserId] = useState('');
+  const [selectedAppointmentSlot, setSelectedAppointmentSlot] = useState('');
   const [reason, setReason] = useState('');
 
   const [msg, setMsg] = useState({
@@ -52,6 +123,17 @@ export default function PatientDashboard({ user, onLogout }) {
   // REQUEST APPOINTMENT
   // ---------------------------------------------------------------------------
 
+  const handleSpecializationChange = (e) => {
+    setSelectedSpecialization(e.target.value);
+    setSelectedDoctorUserId('');
+    setSelectedAppointmentSlot('');
+  };
+
+  const handleDoctorChange = (e) => {
+    setSelectedDoctorUserId(e.target.value);
+    setSelectedAppointmentSlot('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -60,39 +142,28 @@ export default function PatientDashboard({ user, onLogout }) {
       text: '',
     });
 
-    const trimmedDoctor = doctorId.trim();
     const trimmedReason = reason.trim();
 
-    if (!trimmedDoctor) {
+    if (!selectedSpecialization) {
       setMsg({
         type: 'error',
-        text: 'Doctor User ID is required.',
+        text: 'Please select a consultant type.',
       });
       return;
     }
 
-    if (!/^D/i.test(trimmedDoctor)) {
+    if (!selectedDoctorUserId) {
       setMsg({
         type: 'error',
-        text: 'Doctor User ID must start with "D".',
+        text: 'Please select a consultant.',
       });
       return;
     }
 
-    if (!appointmentDate) {
+    if (!selectedAppointmentSlot) {
       setMsg({
         type: 'error',
-        text: 'Appointment Date is required.',
-      });
-      return;
-    }
-
-    const selectedDate = new Date(appointmentDate);
-
-    if (selectedDate <= new Date()) {
-      setMsg({
-        type: 'error',
-        text: 'Appointment Date must be in the future.',
+        text: 'Please select an available date and time.',
       });
       return;
     }
@@ -115,8 +186,8 @@ export default function PatientDashboard({ user, onLogout }) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          doctorUserId: trimmedDoctor,
-          appointmentDate: selectedDate.toISOString(),
+          doctorUserId: selectedDoctorUserId,
+          appointmentDate: selectedAppointmentSlot,
           reason: trimmedReason,
         }),
       });
@@ -129,8 +200,9 @@ export default function PatientDashboard({ user, onLogout }) {
           text: 'Appointment request submitted successfully.',
         });
 
-        setDoctorId('');
-        setAppointmentDate('');
+        setSelectedSpecialization('');
+        setSelectedDoctorUserId('');
+        setSelectedAppointmentSlot('');
         setReason('');
       } else if (res.status === 400 || res.status === 404) {
         setMsg({
@@ -313,9 +385,33 @@ export default function PatientDashboard({ user, onLogout }) {
     }
   };
 
+  const fetchAppointmentDoctors = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/users/appointment-doctors', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+      if (res.ok) {
+        const data = await res.json();
+        setAppointmentDoctors(data.doctors || []);
+      }
+    } catch (err) {
+      console.error('Error loading appointment doctors:', err);
+    }
+  };
+
   useEffect(() => {
     if (view === 'appointments') {
       fetchAppointments();
+    } else if (view === 'request') {
+      fetchAppointmentDoctors();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -440,86 +536,143 @@ export default function PatientDashboard({ user, onLogout }) {
   // REQUEST APPOINTMENT VIEW
   // ---------------------------------------------------------------------------
 
-  const renderRequestForm = () => (
-    <section className="patient-page-section">
-      <div className="section-heading">
-        <div>
-          <p className="section-label">APPOINTMENTS</p>
-          <h2>Request Appointment</h2>
-          <p>
-            Send an appointment request to a registered MediFlow doctor.
-          </p>
-        </div>
-      </div>
+  const renderRequestForm = () => {
+    const filteredDoctors = appointmentDoctors.filter(
+      (doc) => doc.specialization === selectedSpecialization
+    );
 
-      <form
-        className="appointment-form"
-        onSubmit={handleSubmit}
-      >
-        {msg.text && (
-          <div className={`patient-message ${msg.type}`}>
-            {msg.text}
+    const selectedDoctor = appointmentDoctors.find(
+      (doc) => doc.userId === selectedDoctorUserId
+    );
+
+    const activeSlot = selectedDoctor
+      ? buildNextDoctorSlot(selectedDoctor.availabilityDay, selectedDoctor.availabilityTime)
+      : null;
+
+    return (
+      <section className="patient-page-section">
+        <div className="section-heading">
+          <div>
+            <p className="section-label">APPOINTMENTS</p>
+            <h2>Request Appointment</h2>
+            <p>
+              Send an appointment request to a registered MediFlow doctor.
+            </p>
           </div>
-        )}
-
-        <div className="form-group">
-          <label htmlFor="doctorId">
-            Doctor User ID
-          </label>
-
-          <input
-            id="doctorId"
-            type="text"
-            value={doctorId}
-            onChange={(e) => setDoctorId(e.target.value)}
-            placeholder="e.g. D001"
-            required
-          />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="appointmentDate">
-            Appointment Date
-          </label>
-
-          <input
-            id="appointmentDate"
-            type="datetime-local"
-            value={appointmentDate}
-            onChange={(e) =>
-              setAppointmentDate(e.target.value)
-            }
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="reason">
-            Reason
-          </label>
-
-          <textarea
-            id="reason"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Briefly describe the reason for your appointment"
-            rows="5"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="primary-action-btn"
-          disabled={loading}
+        <form
+          className="appointment-form"
+          onSubmit={handleSubmit}
         >
-          {loading
-            ? 'Submitting...'
-            : 'Submit Request'}
-        </button>
-      </form>
-    </section>
-  );
+          {msg.text && (
+            <div className={`patient-message ${msg.type}`}>
+              {msg.text}
+            </div>
+          )}
+
+          <div className="form-group">
+            <label htmlFor="consultantType">
+              Consultant Type
+            </label>
+            <select
+              id="consultantType"
+              className="patient-appointment-select"
+              value={selectedSpecialization}
+              onChange={handleSpecializationChange}
+              required
+            >
+              <option value="">Select consultant type</option>
+              {CONSULTANT_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="consultant">
+              Consultant
+            </label>
+            <select
+              id="consultant"
+              className="patient-appointment-select"
+              value={selectedDoctorUserId}
+              onChange={handleDoctorChange}
+              disabled={!selectedSpecialization}
+              required
+            >
+              <option value="">
+                {!selectedSpecialization
+                  ? 'Select consultant'
+                  : filteredDoctors.length === 0
+                  ? 'No available consultants for this type.'
+                  : 'Select consultant'}
+              </option>
+              {filteredDoctors.map((doc) => {
+                const displayName =
+                  doc.name.startsWith('Dr.') || doc.name.startsWith('Dr ')
+                    ? `${doc.name} (${doc.userId})`
+                    : `Dr. ${doc.name} (${doc.userId})`;
+                return (
+                  <option key={doc.userId} value={doc.userId}>
+                    {displayName}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="appointmentSlot">
+              Available Date & Time
+            </label>
+            <select
+              id="appointmentSlot"
+              className="patient-appointment-select"
+              value={selectedAppointmentSlot}
+              onChange={(e) => setSelectedAppointmentSlot(e.target.value)}
+              disabled={!selectedDoctorUserId}
+              required
+            >
+              <option value="">Select available date & time</option>
+              {activeSlot && (
+                <option value={activeSlot.toISOString()}>
+                  {formatSlotDisplay(activeSlot)}
+                </option>
+              )}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="reason">
+              Reason
+            </label>
+
+            <textarea
+              id="reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Briefly describe the reason for your appointment"
+              rows="5"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="primary-action-btn"
+            disabled={loading}
+          >
+            {loading
+              ? 'Submitting...'
+              : 'Submit Request'}
+          </button>
+        </form>
+      </section>
+    );
+  };
 
   // ---------------------------------------------------------------------------
   // MY APPOINTMENTS

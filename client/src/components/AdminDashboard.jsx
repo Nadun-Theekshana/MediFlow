@@ -36,7 +36,29 @@ export default function AdminDashboard({ user, onLogout }) {
   // Track which doctor's status is being updated
   const [statusUpdatingId, setStatusUpdatingId] = useState(null);
   const [doctorDeletingId, setDoctorDeletingId] = useState(null);
+// Patient management state
+const [patients, setPatients] = useState([]);
+const [patientsLoading, setPatientsLoading] = useState(false);
+const [patientsError, setPatientsError] = useState('');
+const [patientSearch, setPatientSearch] = useState('');
+const [patientPage, setPatientPage] = useState(1);
+const itemsPerPage = 7; // patients per page
+  const [patientDeletingId, setPatientDeletingId] = useState(null);
+
+  // Appointment management state
+  const [adminAppointments, setAdminAppointments] = useState([]);
+  const [appointmentSearch, setAppointmentSearch] = useState('');
+  const [appointmentStatusFilter, setAppointmentStatusFilter] = useState('all');
+  const [appointmentPage, setAppointmentPage] = useState(1);
+  const [approvingAppointmentId, setApprovingAppointmentId] = useState(null);
+  const [appointmentLoading, setAppointmentLoading] = useState(false);
+  const [appointmentError, setAppointmentError] = useState('');
+  const [deletingAppointmentId, setDeletingAppointmentId] = useState(null);
   // Helper to treat undefined isActive as active
+  // Reset patient page when search changes
+  useEffect(() => {
+    setPatientPage(1);
+  }, [patientSearch]);
   const isDoctorActive = (doc) => doc.isActive !== false;
 
   const token = sessionStorage.getItem('token');
@@ -69,42 +91,114 @@ export default function AdminDashboard({ user, onLogout }) {
 
   // Fetch doctors when doctorManagement view is active
   useEffect(() => {
-    if (view !== 'doctorManagement') return;
-    const fetchDoctors = async () => {
-      setDoctorsLoading(true);
-      setDoctorsError('');
-      try {
-        const res = await fetch('http://localhost:5000/api/users/doctors', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (res.status === 401) {
-          sessionStorage.removeItem('token');
-          sessionStorage.removeItem('user');
-          onLogout();
-          return;
-        }
-        if (res.status === 403) {
-          setDoctorsError('Unauthorized to view doctor accounts.');
-          setDoctorsLoading(false);
-          return;
-        }
-        if (!res.ok) {
+    // Fetch data based on active view
+    if (view === 'doctorManagement') {
+      const fetchDoctors = async () => {
+        setDoctorsLoading(true);
+        setDoctorsError('');
+        try {
+          const res = await fetch('http://localhost:5000/api/users/doctors', {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (res.status === 401) {
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+            onLogout();
+            return;
+          }
+          if (res.status === 403) {
+            setDoctorsError('Unauthorized to view doctor accounts.');
+            setDoctorsLoading(false);
+            return;
+          }
+          if (!res.ok) {
+            setDoctorsError('Unable to load Doctor accounts.');
+            setDoctorsLoading(false);
+            return;
+          }
+          const data = await res.json();
+          setDoctors(data.doctors || []);
+        } catch (e) {
           setDoctorsError('Unable to load Doctor accounts.');
+        } finally {
           setDoctorsLoading(false);
-          return;
         }
-        const data = await res.json();
-        setDoctors(data.doctors || []);
-      } catch (e) {
-        setDoctorsError('Unable to load Doctor accounts.');
-      } finally {
-        setDoctorsLoading(false);
-      }
-    };
-    fetchDoctors();
+      };
+      fetchDoctors();
+    } else if (view === 'patientManagement') {
+      const fetchPatients = async () => {
+        setPatientsLoading(true);
+        setPatientsError('');
+        try {
+          const res = await fetch('http://localhost:5000/api/users/patients', {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (res.status === 401) {
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+            onLogout();
+            return;
+          }
+          if (res.status === 403) {
+            setPatientsError('Unauthorized to view patient accounts.');
+            setPatientsLoading(false);
+            return;
+          }
+          if (!res.ok) {
+            setPatientsError('Unable to load Patient accounts.');
+            setPatientsLoading(false);
+            return;
+          }
+          const data = await res.json();
+          setPatients(data.patients || []);
+        } catch (e) {
+          setPatientsError('Unable to load Patient accounts.');
+        } finally {
+          setPatientsLoading(false);
+        }
+      };
+      fetchPatients();
+    } else if (view === 'appointmentManagement') {
+      const fetchAdminAppointments = async () => {
+        setAppointmentLoading(true);
+        setAppointmentError('');
+        try {
+          const res = await fetch('http://localhost:5000/api/appointments/admin', {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.status === 401) {
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+            onLogout();
+            return;
+          }
+          if (res.status === 403) {
+            setAppointmentError('Unauthorized to view appointments.');
+            setAppointmentLoading(false);
+            return;
+          }
+          if (!res.ok) {
+            setAppointmentError('Unable to load appointments.');
+            setAppointmentLoading(false);
+            return;
+          }
+          const data = await res.json();
+          setAdminAppointments(data.appointments || []);
+        } catch (e) {
+          setAppointmentError('Unable to load appointments.');
+        } finally {
+          setAppointmentLoading(false);
+        }
+      };
+      fetchAdminAppointments();
+    }
   }, [view]);
 
   // =========================================================
@@ -417,7 +511,7 @@ export default function AdminDashboard({ user, onLogout }) {
           type="button"
           className="admin-management-card"
           onClick={() =>
-            changeView('adminOverview')
+            changeView('appointmentManagement')
           }
         >
           <div className="admin-card-icon">
@@ -472,7 +566,7 @@ export default function AdminDashboard({ user, onLogout }) {
           type="button"
           className="admin-management-card"
           onClick={() =>
-            changeView('patient')
+            changeView('patientManagement')
           }
         >
           <div className="admin-card-icon">
@@ -1057,6 +1151,572 @@ export default function AdminDashboard({ user, onLogout }) {
       );
   };
 
+  // Delete patient account (only user record)
+  const handleDeletePatient = async (userId) => {
+    if (!userId) return;
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete Patient ${userId}?`
+    );
+    if (!confirmed) return;
+
+    setPatientDeletingId(userId);
+    try {
+      const res = await fetch(`http://localhost:5000/api/users/patients/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 200) {
+        setPatients((current) => {
+          const updated = current.filter((patient) => patient.userId !== userId);
+          const searchVal = patientSearch.trim().toLowerCase();
+          const remainingFiltered = updated.filter((p) => {
+            if (!searchVal) return true;
+            return (
+              (p.userId || '').toLowerCase().includes(searchVal) ||
+              (p.name || '').toLowerCase().includes(searchVal) ||
+              (p.email || '').toLowerCase().includes(searchVal)
+            );
+          });
+          const newTotalPages = Math.max(1, Math.ceil(remainingFiltered.length / 7));
+          setPatientPage((prev) => Math.min(prev, newTotalPages));
+          return updated;
+        });
+
+        const data = await res.json().catch(() => ({}));
+        setMsg(data.message || 'Patient account deleted successfully.');
+        setMsgType('success');
+        return;
+      }
+
+      if (res.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
+      setMsg(data.message || 'Unable to delete Patient account.');
+      setMsgType('error');
+    } catch (e) {
+      setMsg('Unable to delete Patient account.');
+      setMsgType('error');
+    } finally {
+      setPatientDeletingId(null);
+    }
+  };
+
+  const renderPatientManagement = () => {
+    const sortedPatients = [...patients].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return timeB - timeA;
+    });
+
+    const searchValue = patientSearch.trim().toLowerCase();
+
+    const filteredPatients = sortedPatients.filter((patient) => {
+      if (!searchValue) return true;
+      return (
+        (patient.userId || '').toLowerCase().includes(searchValue) ||
+        (patient.name || '').toLowerCase().includes(searchValue) ||
+        (patient.email || '').toLowerCase().includes(searchValue)
+      );
+    });
+
+    const PATIENTS_PER_PAGE = 7;
+    const totalPatientPages = Math.max(1, Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE));
+    const safePage = Math.min(patientPage, totalPatientPages);
+    const startIndex = (safePage - 1) * PATIENTS_PER_PAGE;
+    const visiblePatients = filteredPatients.slice(startIndex, startIndex + PATIENTS_PER_PAGE);
+    const showingStart = filteredPatients.length === 0 ? 0 : startIndex + 1;
+    const showingEnd = Math.min(startIndex + PATIENTS_PER_PAGE, filteredPatients.length);
+
+    return (
+      <div className="admin-page-section pam-page">
+
+        <div className="pam-heading">
+          <div className="pam-eyebrow">ACCOUNT MANAGEMENT</div>
+          <h2>Patient Account Management</h2>
+          <p>Registered Patient Accounts (Newly Created First)</p>
+        </div>
+
+        <div className="pam-toolbar">
+          <button
+            type="button"
+            className="pam-add-button"
+            onClick={() => changeView('patient')}
+          >
+            + Add Patient
+          </button>
+          <div className="pam-search">
+            <span className="pam-search-icon" aria-hidden="true"></span>
+            <input
+              type="text"
+              placeholder="Search patients..."
+              value={patientSearch}
+              onChange={(e) => {
+                setPatientSearch(e.target.value);
+                setPatientPage(1);
+              }}
+            />
+          </div>
+        </div>
+
+        {patientsLoading && (
+          <p className="admin-patient-loading">Loading registered patients...</p>
+        )}
+        {patientsError && (
+          <p className="admin-patient-error">{patientsError}</p>
+        )}
+
+        {!patientsLoading && !patientsError && (
+          <div className="pam-table-card">
+            <div className="pam-table-scroll">
+              <table className="pam-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Created Date</th>
+                    <th>Status</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visiblePatients.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="pam-empty">
+                        No matching Patient accounts found.
+                      </td>
+                    </tr>
+                  ) : (
+                    visiblePatients.map((patient, index) => {
+                      const active = patient.isActive !== false;
+                      return (
+                        <tr key={patient._id || patient.userId}>
+                          <td className="pam-number">{startIndex + index + 1}</td>
+                          <td className="pam-id">{patient.userId}</td>
+                          <td className="pam-name">{patient.name}</td>
+                          <td>{patient.email}</td>
+                          <td>
+                            {patient.createdAt
+                              ? new Date(patient.createdAt).toLocaleString()
+                              : 'Not available'}
+                          </td>
+                          <td className="pam-center">
+                            <span
+                              className={
+                                active
+                                  ? 'pam-status pam-status-active'
+                                  : 'pam-status pam-status-inactive'
+                              }
+                            >
+                              <span className="pam-status-dot"></span>
+                              {active ? 'Active' : 'Inactive'}
+                            </span>
+                          </td>
+                          <td className="pam-center">
+                            <button
+                              type="button"
+                              className="pam-delete-button"
+                              onClick={() => handleDeletePatient(patient.userId)}
+                              disabled={patientDeletingId === patient.userId}
+                            >
+                              {patientDeletingId === patient.userId
+                                ? 'Deleting...'
+                                : 'Delete'}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="pam-footer">
+              <div className="pam-count">
+                Showing {showingStart} to {showingEnd} of {filteredPatients.length} patients
+              </div>
+              <div className="pam-pagination">
+                <button
+                  type="button"
+                  className="pam-page-button"
+                  disabled={safePage === 1}
+                  onClick={() => setPatientPage(Math.max(1, safePage - 1))}
+                >
+                  ‹
+                </button>
+                {Array.from({ length: totalPatientPages }, (_, i) => i + 1).map((pageNumber) => (
+                  <button
+                    type="button"
+                    key={pageNumber}
+                    className={
+                      safePage === pageNumber
+                        ? 'pam-page-button pam-page-active'
+                        : 'pam-page-button'
+                    }
+                    onClick={() => setPatientPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="pam-page-button"
+                  disabled={safePage === totalPatientPages}
+                  onClick={() => setPatientPage(Math.min(totalPatientPages, safePage + 1))}
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAppointmentManagement = () => {
+    // Reset page when search or filter changes
+    const APPT_PER_PAGE = 7;
+
+    const searchVal = appointmentSearch.trim().toLowerCase();
+
+    const filtered = adminAppointments.filter((a) => {
+      const matchesSearch =
+        !searchVal ||
+        (a.patientUserId || '').toLowerCase().includes(searchVal) ||
+        (a.patientName  || '').toLowerCase().includes(searchVal) ||
+        (a.doctorUserId || '').toLowerCase().includes(searchVal) ||
+        (a.doctorName   || '').toLowerCase().includes(searchVal) ||
+        (a.reason       || '').toLowerCase().includes(searchVal);
+
+      const matchesStatus =
+        appointmentStatusFilter === 'all' ||
+        a.status === appointmentStatusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+
+    const totalPages  = Math.max(1, Math.ceil(filtered.length / APPT_PER_PAGE));
+    const safePage    = Math.min(appointmentPage, totalPages);
+    const startIndex  = (safePage - 1) * APPT_PER_PAGE;
+    const visible     = filtered.slice(startIndex, startIndex + APPT_PER_PAGE);
+    const showStart   = filtered.length === 0 ? 0 : startIndex + 1;
+    const showEnd     = Math.min(startIndex + APPT_PER_PAGE, filtered.length);
+
+    const handleAdminApproveAppointment = async (appointmentId) => {
+      const confirmed = window.confirm('Approve this appointment request?');
+      if (!confirmed) return;
+
+      setApprovingAppointmentId(appointmentId);
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/appointments/${appointmentId}/admin-approve`,
+          {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (res.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          onLogout();
+          return;
+        }
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          setMsg(data.message || 'Unable to approve appointment.');
+          setMsgType('error');
+          return;
+        }
+        // Update UI without reload
+        setAdminAppointments((current) =>
+          current.map((appointment) =>
+            appointment._id === appointmentId
+              ? { ...appointment, status: 'approved' }
+              : appointment
+          )
+        );
+      } catch (e) {
+        setMsg('Unable to approve appointment.');
+        setMsgType('error');
+      } finally {
+        setApprovingAppointmentId(null);
+      }
+    };
+
+    const handleDeleteCancelledAppointment = async (appointmentId) => {
+      const confirmed = window.confirm(
+        'Are you sure you want to permanently delete this cancelled appointment?'
+      );
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        setDeletingAppointmentId(appointmentId);
+        setMsg('');
+        setMsgType('');
+
+        const token = sessionStorage.getItem('token');
+
+        const response = await fetch(
+          `http://localhost:5000/api/appointments/${appointmentId}/admin-delete`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        if (response.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          onLogout();
+          return;
+        }
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || 'Unable to delete appointment.'
+          );
+        }
+
+        setAdminAppointments((current) =>
+          current.filter(
+            (appointment) => appointment._id !== appointmentId
+          )
+        );
+
+        // Clamp page to valid range after deletion
+        setAppointmentPage((prev) => {
+          const remainAfterDelete = filtered.length - 1;
+          const newTotalPages = Math.max(1, Math.ceil(remainAfterDelete / APPT_PER_PAGE));
+          return Math.min(prev, newTotalPages);
+        });
+      } catch (error) {
+        setMsg(
+          error.message || 'Unable to delete appointment.'
+        );
+        setMsgType('error');
+      } finally {
+        setDeletingAppointmentId(null);
+      }
+    };
+
+    const renderStatusBadge = (status) => {
+      const classMap = {
+        pending:   'aam-status aam-status-pending',
+        approved:  'aam-status aam-status-approved',
+        rejected:  'aam-status aam-status-rejected',
+        cancelled: 'aam-status aam-status-cancelled',
+      };
+      const label = status
+        ? status.charAt(0).toUpperCase() + status.slice(1)
+        : 'Pending';
+      return (
+        <span className={classMap[status] || 'aam-status'}>
+          <span className="aam-status-dot" />
+          {label}
+        </span>
+      );
+    };
+
+    const renderActionButton = (appt) => {
+      const isApproving = approvingAppointmentId === appt._id;
+      const isDeleting  = deletingAppointmentId  === appt._id;
+
+      if (appt.status === 'pending') {
+        return (
+          <button
+            type="button"
+            className="aam-approve-button"
+            onClick={() => handleAdminApproveAppointment(appt._id)}
+            disabled={isApproving}
+          >
+            {isApproving ? 'Approving...' : 'Approve'}
+          </button>
+        );
+      }
+      if (appt.status === 'cancelled') {
+        return (
+          <button
+            type="button"
+            className="aam-delete-button"
+            onClick={() => handleDeleteCancelledAppointment(appt._id)}
+            disabled={isDeleting}
+          >
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </button>
+        );
+      }
+      const labelMap = {
+        approved: 'Approved',
+        rejected: 'Rejected',
+      };
+      return (
+        <button
+          type="button"
+          className="aam-approve-button"
+          disabled
+        >
+          {labelMap[appt.status] || appt.status}
+        </button>
+      );
+    };
+
+    return (
+      <div className="aam-page">
+        <div className="aam-heading">
+          <p className="aam-eyebrow">ADMINISTRATOR ACCESS</p>
+          <h2>All Appointments</h2>
+          <span>View and approve patient appointment requests.</span>
+        </div>
+
+        <div className="aam-card">
+          {/* Toolbar */}
+          <div className="aam-toolbar">
+            <div className="aam-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="aam-search-icon">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+              <input
+                type="text"
+                className="aam-search-input"
+                placeholder="Search by patient, doctor or reason..."
+                value={appointmentSearch}
+                onChange={(e) => {
+                  setAppointmentSearch(e.target.value);
+                  setAppointmentPage(1);
+                }}
+              />
+            </div>
+            <select
+              className="aam-filter"
+              value={appointmentStatusFilter}
+              onChange={(e) => {
+                setAppointmentStatusFilter(e.target.value);
+                setAppointmentPage(1);
+              }}
+            >
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          {/* Loading / Error */}
+          {appointmentLoading && (
+            <p className="aam-loading">Loading appointments...</p>
+          )}
+          {appointmentError && (
+            <p className="aam-error">{appointmentError}</p>
+          )}
+
+          {!appointmentLoading && !appointmentError && (
+            <>
+              {/* Table */}
+              <div className="aam-table-scroll">
+                <table className="aam-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Patient ID</th>
+                      <th>Patient Name</th>
+                      <th>Doctor ID</th>
+                      <th>Doctor Name</th>
+                      <th>Date &amp; Time</th>
+                      <th>Reason</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visible.length === 0 ? (
+                      <tr>
+                        <td colSpan="9" className="aam-empty">
+                          No matching appointments found.
+                        </td>
+                      </tr>
+                    ) : (
+                      visible.map((appt, index) => (
+                        <tr key={appt._id}>
+                          <td>{startIndex + index + 1}</td>
+                          <td>{appt.patientUserId}</td>
+                          <td>{appt.patientName}</td>
+                          <td>{appt.doctorUserId}</td>
+                          <td>{appt.doctorName}</td>
+                          <td>{new Date(appt.appointmentDate).toLocaleString()}</td>
+                          <td className="aam-reason">{appt.reason}</td>
+                          <td>{renderStatusBadge(appt.status)}</td>
+                          <td>{renderActionButton(appt)}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Footer */}
+              <div className="aam-footer">
+                <div className="aam-count">
+                  Showing {showStart} to {showEnd} of {filtered.length} appointments
+                </div>
+                <div className="aam-pagination">
+                  <button
+                    type="button"
+                    className="aam-page-button"
+                    disabled={safePage === 1}
+                    onClick={() => setAppointmentPage(Math.max(1, safePage - 1))}
+                  >
+                    ‹
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      type="button"
+                      key={pageNum}
+                      className={
+                        safePage === pageNum
+                          ? 'aam-page-button aam-page-active'
+                          : 'aam-page-button'
+                      }
+                      onClick={() => setAppointmentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="aam-page-button"
+                    disabled={safePage === totalPages}
+                    onClick={() => setAppointmentPage(Math.min(totalPages, safePage + 1))}
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderContent = () => {
     switch (view) {
       case 'doctor':
@@ -1070,6 +1730,12 @@ export default function AdminDashboard({ user, onLogout }) {
 
       case 'doctorManagement':
         return renderDoctorManagement();
+
+      case 'patientManagement':
+        return renderPatientManagement();
+
+      case 'appointmentManagement':
+        return renderAppointmentManagement();
 
       default:
         return renderHome();
@@ -1162,7 +1828,13 @@ export default function AdminDashboard({ user, onLogout }) {
 
       {/* CONTENT */}
 
-      <main className="admin-content">
+      <main
+        className={`admin-content ${
+          view === 'doctorManagement' || view === 'doctor' || view === 'patientManagement' || view === 'appointmentManagement'
+            ? 'admin-content-scrollable'
+            : ''
+        }`}
+      >
         {renderContent()}
       </main>
 

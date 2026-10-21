@@ -152,7 +152,7 @@
   width: 100%;
   min-height: 0;
   padding: 35px 5.2% 28px;
-  overflow: hidden;
+  overflow: auto;
 }
 
 /* =========================================================
@@ -1981,4 +1981,1106 @@
 
 .doctor-management-table {
   min-width: 980px;
+}
+
+/* =========================================================
+   ADMIN INNER PAGE VERTICAL SCROLL
+   Doctor Management + Add Doctor only
+   ========================================================= */
+
+.admin-content.admin-content-scrollable {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  scrollbar-gutter: stable;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* Small bottom breathing room so content does not touch footer */
+
+.admin-content.admin-content-scrollable
+.admin-page-section {
+  padding-bottom: 28px;
+}
+
+
+/* Doctor Management should grow naturally with all rows */
+
+.admin-content.admin-content-scrollable
+.doctor-management-page {
+  height: auto;
+  min-height: min-content;
+}
+
+
+/* Keep horizontal table scrolling, but do NOT block page vertical scroll */
+
+.admin-content.admin-content-scrollable
+.doctor-table-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+
+/* Optional clean scrollbar */
+
+.admin-content.admin-content-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-content.admin-content-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-content.admin-content-scrollable::-webkit-scrollbar-thumb {
+  background: #c6d8eb;
+  border-radius: 999px;
+}
+
+.admin-content.admin-content-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #a9c4df;
+}
+
+
+/* =========================================================
+   PATIENT ACCOUNT MANAGEMENT
+   FINAL ISOLATED DESIGN
+   pam-* namespace
+   ========================================================= */
+
+
+/* PAGE */
+
+.admin-page-section.pam-page {
+  width: min(1180px, calc(100% - 20px));
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-bottom: 32px;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.pam-heading {
+  margin: 0 0 28px;
+}
+
+.pam-eyebrow {
+  margin-bottom: 9px;
+  color: #147cf3;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.pam-heading h2 {
+  margin: 0 0 8px;
+  color: #0a2458;
+  font-size: clamp(30px, 2.5vw, 40px);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.pam-heading p {
+  margin: 0;
+  color: #687da4;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.pam-toolbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 14px;
+  box-sizing: border-box;
+}
+
+
+/* ADD PATIENT */
+
+.pam-add-button {
+  min-width: 135px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  margin: 0;
+  border: none;
+  outline: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1684ff 0%, #0877ef 100%);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(22, 126, 243, 0.18);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.pam-add-button:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #087cf4 0%, #056cdf 100%);
+  box-shadow: 0 7px 18px rgba(22, 126, 243, 0.24);
+}
+
+.pam-add-button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.pam-search {
+  width: 360px;
+  max-width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 15px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #d5e5f5;
+  border-radius: 9px;
+  box-shadow: 0 4px 14px rgba(50, 90, 135, 0.05);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pam-search:focus-within {
+  border-color: #8fc4ff;
+  box-shadow: 0 0 0 3px rgba(22, 126, 243, 0.08);
+}
+
+.pam-search-icon {
+  width: 16px;
+  height: 16px;
+  position: relative;
+  display: inline-block;
+  flex: 0 0 16px;
+  box-sizing: border-box;
+  border: 2px solid #6682ac;
+  border-radius: 50%;
+}
+
+.pam-search-icon::after {
+  content: "";
+  width: 7px;
+  height: 2px;
+  position: absolute;
+  right: -6px;
+  bottom: -3px;
+  background: #6682ac;
+  border-radius: 999px;
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
+.pam-search input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #183462;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 400;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.pam-search input::placeholder {
+  color: #8395b3;
+  opacity: 1;
+}
+
+
+/* =========================================================
+   TABLE CARD
+   ========================================================= */
+
+.pam-table-card {
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #d7e8f7;
+  border-radius: 15px;
+  box-shadow: 0 9px 27px rgba(44, 87, 132, 0.07);
+}
+
+.pam-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.pam-table {
+  width: 100%;
+  min-width: 980px;
+  margin: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: auto;
+  background: #ffffff;
+  font-family: inherit;
+}
+
+.pam-table thead {
+  background: linear-gradient(90deg, #eef7ff 0%, #e6f2ff 100%);
+}
+
+.pam-table thead tr {
+  height: 48px;
+}
+
+.pam-table th {
+  padding: 0 16px;
+  box-sizing: border-box;
+  text-align: left;
+  vertical-align: middle;
+  color: #15366b;
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: none;
+  border-bottom: 1px solid #d8e8f7;
+}
+
+.pam-table tbody tr {
+  height: 56px;
+  background: #ffffff;
+  transition: background 0.15s ease;
+}
+
+.pam-table tbody tr:hover {
+  background: #fbfdff;
+}
+
+.pam-table td {
+  padding: 0 16px;
+  box-sizing: border-box;
+  vertical-align: middle;
+  text-align: left;
+  color: #344e78;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 400;
+  border: none;
+  border-bottom: 1px solid #e8f0f8;
+}
+
+.pam-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   TABLE COLUMNS
+   ========================================================= */
+
+.pam-table th:nth-child(1),
+.pam-table td:nth-child(1) {
+  width: 55px;
+  text-align: center;
+}
+
+.pam-number {
+  color: #7187a8 !important;
+}
+
+.pam-table th:nth-child(2),
+.pam-table td:nth-child(2) {
+  width: 130px;
+}
+
+.pam-id {
+  color: #10275e !important;
+  font-weight: 700 !important;
+}
+
+.pam-table th:nth-child(3),
+.pam-table td:nth-child(3) {
+  width: 185px;
+}
+
+.pam-name {
+  color: #294675 !important;
+  font-weight: 500 !important;
+}
+
+.pam-table th:nth-child(4),
+.pam-table td:nth-child(4) {
+  min-width: 245px;
+}
+
+.pam-table th:nth-child(5),
+.pam-table td:nth-child(5) {
+  min-width: 195px;
+}
+
+.pam-table th:nth-child(6),
+.pam-table td:nth-child(6) {
+  width: 130px;
+  text-align: center;
+}
+
+.pam-table th:nth-child(7),
+.pam-table td:nth-child(7) {
+  width: 115px;
+  text-align: center;
+}
+
+.pam-center {
+  text-align: center !important;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.pam-status {
+  min-width: 80px;
+  height: 27px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 11px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pam-status-active {
+  color: #078447;
+  background: #dcf8e9;
+  border: 1px solid #d0f2df;
+}
+
+.pam-status-inactive {
+  color: #ef3f43;
+  background: #ffe8e8;
+  border: 1px solid #ffd9da;
+}
+
+.pam-status-dot {
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  flex: 0 0 7px;
+  border-radius: 50%;
+}
+
+.pam-status-active .pam-status-dot {
+  background: #13ad61;
+}
+
+.pam-status-inactive .pam-status-dot {
+  background: #ff4b50;
+}
+
+
+/* =========================================================
+   DELETE BUTTON
+   ========================================================= */
+
+.pam-delete-button {
+  min-width: 72px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  margin: 0;
+  box-sizing: border-box;
+  border: 1px solid #ffcaca;
+  outline: none;
+  border-radius: 7px;
+  background: #fff0f0;
+  color: #e23c3c;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.pam-delete-button:hover:not(:disabled) {
+  background: #ffe2e2;
+  border-color: #ffb6b6;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 9px rgba(225, 58, 58, 0.08);
+}
+
+.pam-delete-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pam-delete-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.pam-empty {
+  height: 82px;
+  text-align: center !important;
+  color: #7185a4 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.pam-footer {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  color: #657da4;
+  background: #ffffff;
+  border-top: 1px solid #e4eef8;
+}
+
+.pam-count {
+  color: #657da4;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.pam-pagination {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pam-page-button {
+  min-width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  margin: 0;
+  box-sizing: border-box;
+  border: 1px solid #d9e7f5;
+  outline: none;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #2768bc;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.pam-page-button:hover:not(:disabled):not(.pam-page-active) {
+  background: #f2f8ff;
+  border-color: #b9d8f6;
+}
+
+.pam-page-button.pam-page-active {
+  color: #ffffff;
+  background: #167df3;
+  border-color: #167df3;
+  box-shadow: 0 3px 8px rgba(22, 125, 243, 0.18);
+}
+
+.pam-page-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.pam-table-scroll::-webkit-scrollbar {
+  height: 7px;
+}
+
+.pam-table-scroll::-webkit-scrollbar-track {
+  background: #f3f8fd;
+}
+
+.pam-table-scroll::-webkit-scrollbar-thumb {
+  background: #c6d8eb;
+  border-radius: 999px;
+}
+
+.pam-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a9c4df;
+}
+
+
+/* =========================================================
+   LAPTOP HEIGHT
+   ========================================================= */
+
+@media (min-width: 1001px) and (max-height: 800px) {
+
+  .admin-page-section.pam-page {
+    max-width: 1080px;
+  }
+
+  .pam-heading {
+    margin-bottom: 20px;
+  }
+
+  .pam-heading h2 {
+    font-size: 31px;
+  }
+
+  .pam-add-button,
+  .pam-search {
+    height: 40px;
+  }
+
+  .pam-table thead tr {
+    height: 42px;
+  }
+
+  .pam-table tbody tr {
+    height: 48px;
+  }
+
+  .pam-footer {
+    min-height: 43px;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .admin-page-section.pam-page {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .pam-toolbar {
+    gap: 16px;
+  }
+
+  .pam-search {
+    width: min(340px, 100%);
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .pam-heading h2 {
+    font-size: 28px;
+  }
+
+  .pam-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .pam-add-button {
+    width: 100%;
+  }
+
+  .pam-search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .pam-table-card {
+    border-radius: 12px;
+  }
+
+  .pam-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pam-table {
+    min-width: 920px;
+  }
+}
+
+/* =========================================================
+   AAM — ADMIN APPOINTMENT MANAGEMENT
+   Isolated namespace: aam-*  (no globals)
+   ========================================================= */
+
+.aam-page {
+  width: 100%;
+  max-width: 1460px;
+  margin: 0 auto;
+}
+
+/* Heading */
+.aam-eyebrow {
+  margin: 0 0 4px;
+  color: #1679ef;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.aam-heading {
+  margin-bottom: 22px;
+}
+
+.aam-heading h2 {
+  margin: 0 0 5px;
+  color: #10244e;
+  font-size: 31px;
+  font-weight: 800;
+}
+
+.aam-heading span {
+  color: #70819b;
+  font-size: 14px;
+}
+
+/* Card wrapper */
+.aam-card {
+  background: #ffffff;
+  border: 1px solid #dce8f5;
+  border-radius: 16px;
+  box-shadow: 0 9px 25px rgba(31, 75, 120, 0.08);
+  overflow: hidden;
+}
+
+/* Toolbar */
+.aam-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 22px;
+  border-bottom: 1px solid #e8f0fa;
+  flex-wrap: wrap;
+}
+
+/* Search wrapper */
+.aam-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f8ff;
+  border: 1px solid #cad9ee;
+  border-radius: 9px;
+  padding: 0 12px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 420px;
+  height: 38px;
+}
+
+.aam-search-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: #8099b9;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.aam-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: #253b5e;
+  width: 100%;
+}
+
+.aam-search-input::placeholder {
+  color: #9bb1cc;
+}
+
+/* Status filter dropdown */
+.aam-filter {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #cad9ee;
+  border-radius: 9px;
+  background: #f5f8ff;
+  color: #253b5e;
+  font-family: inherit;
+  font-size: 13.5px;
+  cursor: pointer;
+  outline: none;
+  min-width: 140px;
+}
+
+.aam-filter:focus {
+  border-color: #1679ef;
+  box-shadow: 0 0 0 3px rgba(22, 121, 239, 0.1);
+}
+
+/* Loading / Error */
+.aam-loading,
+.aam-error {
+  padding: 18px 22px;
+  font-size: 14px;
+}
+
+.aam-loading {
+  color: #536d99;
+}
+
+.aam-error {
+  color: #b42318;
+}
+
+/* Table scroll wrapper */
+.aam-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Table */
+.aam-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.aam-table thead tr {
+  background: #e8f1fb;
+}
+
+.aam-table thead th {
+  padding: 12px 14px;
+  text-align: left;
+  color: #1b3a6b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.aam-table tbody tr {
+  border-bottom: 1px solid #edf3fa;
+  transition: background 0.12s ease;
+}
+
+.aam-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.aam-table tbody tr:hover {
+  background: #f6faff;
+}
+
+.aam-table tbody td {
+  padding: 11px 14px;
+  color: #20365c;
+  vertical-align: middle;
+}
+
+.aam-reason {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Empty state */
+.aam-empty {
+  padding: 32px 14px !important;
+  text-align: center;
+  color: #8099b9;
+  font-size: 14px;
+}
+
+/* ---- STATUS PILLS ---- */
+.aam-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.aam-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.aam-status-pending {
+  background: #fff1d8;
+  color: #e18400;
+}
+
+.aam-status-pending .aam-status-dot {
+  background: #e18400;
+}
+
+.aam-status-approved {
+  background: #dcf8e9;
+  color: #078447;
+}
+
+.aam-status-approved .aam-status-dot {
+  background: #078447;
+}
+
+.aam-status-rejected {
+  background: #ffe3e5;
+  color: #df3945;
+}
+
+.aam-status-rejected .aam-status-dot {
+  background: #df3945;
+}
+
+.aam-status-cancelled {
+  background: #edf1f5;
+  color: #687789;
+}
+
+.aam-status-cancelled .aam-status-dot {
+  background: #687789;
+}
+
+/* ---- APPROVE BUTTON ---- */
+.aam-approve-button {
+  min-width: 86px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: none;
+  border-radius: 7px;
+  background: #20b968;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.aam-approve-button:hover:not(:disabled) {
+  background: #159d57;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(32, 185, 104, 0.16);
+}
+
+.aam-approve-button:disabled {
+  background: #eef1f4;
+  color: #929ba8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ---- FOOTER ---- */
+.aam-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid #e8f0fa;
+}
+
+.aam-count {
+  color: #536d99;
+  font-size: 13px;
+}
+
+/* ---- PAGINATION ---- */
+.aam-pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.aam-page-button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #cad9ee;
+  border-radius: 7px;
+  background: #f5f8ff;
+  color: #253b5e;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+.aam-page-button:hover:not(:disabled) {
+  background: #e0edff;
+  border-color: #a0c3f5;
+}
+
+.aam-page-button:disabled {
+  color: #b0bccf;
+  cursor: not-allowed;
+}
+
+.aam-page-active {
+  background: #1679ef;
+  border-color: #1679ef;
+  color: #ffffff;
+}
+
+.aam-page-active:hover:not(:disabled) {
+  background: #096ad7;
+  border-color: #096ad7;
+  color: #ffffff;
+}
+
+/* ---- DELETE BUTTON (cancelled appointments) ---- */
+.aam-delete-button {
+  min-width: 86px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 15px;
+
+  border: 1px solid #ffc4c7;
+  border-radius: 7px;
+
+  background: #fff0f1;
+
+  color: #e33d47;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.aam-delete-button:hover:not(:disabled) {
+  background: #ffe1e3;
+
+  border-color: #ffadb2;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px
+    rgba(227, 61, 71, 0.10);
+}
+
+.aam-delete-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.aam-delete-button:disabled {
+  opacity: 0.6;
+
+  cursor: wait;
+
+  transform: none;
+
+  box-shadow: none;
 }

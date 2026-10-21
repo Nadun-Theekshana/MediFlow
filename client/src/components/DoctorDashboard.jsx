@@ -14,7 +14,7 @@ export default function DoctorDashboard({ user, onLogout }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const [approvingId, setApprovingId] = useState('');
+  // approvingId removed — Admin now handles approval
   const [rejectingId, setRejectingId] = useState('');
 
   const [successMessage, setSuccessMessage] = useState('');
@@ -99,77 +99,7 @@ export default function DoctorDashboard({ user, onLogout }) {
     }
   };
 
-  // =========================================================
-  // APPROVE
-  // =========================================================
-
-  const approveAppointment = async (id) => {
-    setApprovingId(id);
-    setSuccessMessage('');
-    setError('');
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/appointments/${id}/status`,
-        {
-          method: 'PATCH',
-
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-
-          body: JSON.stringify({
-            status: 'approved',
-          }),
-        }
-      );
-
-      if (response.status === 401) {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('user');
-
-        onLogout();
-        return;
-      }
-
-      if (response.status === 403) {
-        setError(
-          'You are not authorized to perform this action.'
-        );
-        return;
-      }
-
-      if (response.status === 404) {
-        setError('Appointment not found.');
-        return;
-      }
-
-      if (response.status === 400) {
-        setError('Invalid request.');
-        return;
-      }
-
-      if (!response.ok) {
-        setError(
-          'Unable to connect to the server. Please try again.'
-        );
-        return;
-      }
-
-      setSuccessMessage(
-        'Appointment approved successfully.'
-      );
-
-      await fetchAppointments();
-    } catch (error) {
-      setError(
-        'Unable to connect to the server. Please try again.'
-      );
-    } finally {
-      setApprovingId('');
-    }
-  };
+  // NOTE: Approve functionality moved to Admin — Doctors can only Reject.
 
   // =========================================================
   // REJECT
@@ -511,30 +441,11 @@ export default function DoctorDashboard({ user, onLogout }) {
 
                   <button
                     type="button"
-                    className="doctor-approve-btn"
-                    onClick={() =>
-                      approveAppointment(appt._id)
-                    }
-                    disabled={
-                      approvingId === appt._id ||
-                      rejectingId === appt._id
-                    }
-                  >
-                    {approvingId === appt._id
-                      ? 'Approving...'
-                      : 'Approve'}
-                  </button>
-
-                  <button
-                    type="button"
                     className="doctor-reject-btn"
                     onClick={() =>
                       rejectAppointment(appt._id)
                     }
-                    disabled={
-                      rejectingId === appt._id ||
-                      approvingId === appt._id
-                    }
+                    disabled={rejectingId === appt._id}
                   >
                     {rejectingId === appt._id
                       ? 'Rejecting...'

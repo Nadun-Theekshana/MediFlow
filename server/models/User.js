@@ -60,8 +60,22 @@ const userSchema = new mongoose.Schema({
             "Urologist",
             "Other"
         ]
+    },
+    availabilityDay: {
+        type: String,
+        enum: [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday'
+        ]
+    },
+    availabilityTime: {
+        type: String
     }
-});
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 
