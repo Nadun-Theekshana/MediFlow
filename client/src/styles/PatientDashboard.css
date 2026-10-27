@@ -178,7 +178,7 @@
 .patient-logout-btn {
   border: none;
 
-  background: #2582ee;
+  background: linear-gradient(135deg, #ff4b3e, #f23231);
 
   color: white;
 
@@ -199,7 +199,7 @@
 
 
 .patient-logout-btn:hover {
-  background: #176fd4;
+  background: red;
 
   transform: translateY(-1px);
 
@@ -372,6 +372,15 @@
 
   stroke: white;
   stroke-width: 3;
+}
+
+
+.feature-icon svg .doc-symbol {
+  fill: none;
+
+  stroke: white;
+  stroke-width: 3;
+  stroke-linecap: round;
 }
 
 
@@ -1154,8 +1163,7 @@
   border-color: #2584ee;
 
   box-shadow:
-    0 0 0 3px
-    rgba(37, 132, 238, 0.10);
+    0 0 0 3px rgba(37, 132, 238, 0.10);
 
   background-color: #ffffff;
 }
@@ -1166,4 +1174,240 @@
   background-color: #f3f6fa;
 
   cursor: not-allowed;
+}
+
+/* ==========================================================================
+   PATIENT PRESCRIPTION CARDS (ppc-) - SAMPLE 2 LAYOUT
+   ========================================================================== */
+
+.ppc-page {
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+.ppc-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.ppc-toolbar {
+  display: flex;
+  align-items: center;
+}
+
+.ppc-filter {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #cbdced;
+  background-color: #ffffff;
+  color: #10244c;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(37, 130, 238, 0.08);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ppc-filter:focus {
+  border-color: #2582ee;
+  box-shadow: 0 0 0 3px rgba(37, 130, 238, 0.15);
+}
+
+.ppc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.ppc-card {
+  background: #ffffff;
+  border: 1px solid #dbe8f8;
+  border-radius: 18px;
+  padding: 28px 32px;
+  box-shadow: 0 6px 24px rgba(30, 73, 120, 0.06);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 32px;
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.ppc-card:hover {
+  transform: translateY(-2px);
+  border-color: #bad6fa;
+  box-shadow: 0 10px 30px rgba(37, 130, 238, 0.12);
+}
+
+.ppc-date {
+  width: 105px;
+  min-width: 105px;
+  background: #edf6ff;
+  border: 1px solid #d4e7fc;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.ppc-date-month {
+  font-size: 13px;
+  font-weight: 800;
+  color: #2582ee;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.ppc-date-day {
+  font-size: 34px;
+  font-weight: 800;
+  color: #0c1f47;
+  line-height: 1.1;
+  margin: 4px 0;
+}
+
+.ppc-date-year {
+  font-size: 14px;
+  font-weight: 600;
+  color: #73809a;
+}
+
+.ppc-doctor {
+  flex: 1.1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ppc-doctor h3 {
+  margin: 0 0 4px;
+  font-size: 21px;
+  font-weight: 700;
+  color: #0c1f47;
+  letter-spacing: -0.3px;
+}
+
+.ppc-specialization {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2582ee;
+}
+
+.ppc-appointment {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: #4b5d78;
+}
+
+.ppc-reason {
+  margin: 0;
+  font-size: 14px;
+  color: #4b5d78;
+}
+
+.ppc-medicines {
+  flex: 1.4;
+  border-left: 1px solid #eef3fb;
+  padding-left: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ppc-medicines-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ppc-medicine-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ppc-medicine-name-dosage {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0c1f47;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.ppc-bullet {
+  color: #2582ee;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.ppc-medicine-instructions {
+  font-size: 14px;
+  color: #687792;
+  padding-left: 14px;
+}
+
+.ppc-empty {
+  background: #ffffff;
+  border: 1px solid #dbe8f8;
+  border-radius: 18px;
+  padding: 56px 32px;
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(30, 73, 120, 0.05);
+}
+
+.ppc-empty h3 {
+  margin: 0 0 8px;
+  color: #0c1f47;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.ppc-empty p {
+  margin: 0;
+  color: #73809a;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .ppc-card {
+    flex-direction: column;
+    gap: 20px;
+    padding: 22px;
+  }
+
+  .ppc-date {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    gap: 12px;
+    padding: 12px 18px;
+  }
+
+  .ppc-date-day {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .ppc-medicines {
+    border-left: none;
+    border-top: 1px solid #eef3fb;
+    padding-left: 0;
+    padding-top: 18px;
+  }
 }

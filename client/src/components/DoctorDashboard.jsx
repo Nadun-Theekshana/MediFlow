@@ -3,6 +3,36 @@
 import { useEffect, useState } from 'react';
 import '../styles/DoctorDashboard.css';
 
+// Helpers for current calendar week (Monday 00:00:00.000 to Sunday 23:59:59.999)
+function getCurrentWeekRange() {
+  const now = new Date();
+  const day = now.getDay(); // 0: Sun, 1: Mon, ..., 6: Sat
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  return { monday, sunday };
+}
+
+function isDateInCurrentWeek(dateInput) {
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return false;
+  const { monday, sunday } = getCurrentWeekRange();
+  return d >= monday && d <= sunday;
+}
+
+function formatWeekRangeDisplay() {
+  const { monday, sunday } = getCurrentWeekRange();
+  const options = { month: 'short', day: 'numeric', year: 'numeric' };
+  return `${monday.toLocaleDateString('en-US', options)} - ${sunday.toLocaleDateString('en-US', options)}`;
+}
+
 export default function DoctorDashboard({ user, onLogout }) {
   // =========================================================
   // STATE
@@ -20,6 +50,26 @@ export default function DoctorDashboard({ user, onLogout }) {
   const [successMessage, setSuccessMessage] = useState('');
 
   const token = sessionStorage.getItem('token');
+
+  // Doctor Profile & Schedule state
+  const [doctorProfile, setDoctorProfile] = useState(null);
+  const [weeklyAvailability, setWeeklyAvailability] = useState([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilitySaving, setAvailabilitySaving] = useState(false);
+  const [availabilityMessage, setAvailabilityMessage] = useState('');
+  const [availabilityError, setAvailabilityError] = useState('');
+
+  // Weekly Patients for Prescriptions state
+  const [prescriptionPatientPage, setPrescriptionPatientPage] = useState(1);
+  const [selectedPrescriptionAppointment, setSelectedPrescriptionAppointment] = useState(null);
+  const [prescriptionModalOpen, setPrescriptionModalOpen] = useState(false);
+  const [prescriptionMedicines, setPrescriptionMedicines] = useState([
+    { medication: '', dosage: '', instructions: '' },
+  ]);
+  const [prescriptionSaving, setPrescriptionSaving] = useState(false);
+  const [prescriptionMessage, setPrescriptionMessage] = useState('');
+  const [prescriptionError, setPrescriptionError] = useState('');
+  const [prescriptionModalError, setPrescriptionModalError] = useState('');
 
   // =========================================================
   // ROLE GUARD
@@ -40,6 +90,9 @@ export default function DoctorDashboard({ user, onLogout }) {
   const changeView = (newView) => {
     setError('');
     setSuccessMessage('');
+    setPrescriptionMessage('');
+    setPrescriptionError('');
+    setPrescriptionPatientPage(1);
     setView(newView);
   };
 
@@ -177,9 +230,100 @@ export default function DoctorDashboard({ user, onLogout }) {
   // LOAD APPOINTMENTS WHEN VIEW OPENS
   // =========================================================
 
+  // Fetch doctor profile when doctorProfile view is opened
+  const fetchDoctorProfile = async () => {
+    setAvailabilityLoading(true);
+    setAvailabilityError('');
+    setAvailabilityMessage('');
+
+    try {
+      const response = await fetch(
+        'http://localhost:5000/api/users/doctor/profile',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setAvailabilityError(data.message || 'Unable to load profile.');
+        return;
+      }
+
+      setDoctorProfile(data.doctor);
+      setWeeklyAvailability(
+        Array.isArray(data.doctor?.weeklyAvailability)
+          ? data.doctor.weeklyAvailability.map((s) => ({ day: s.day, time: s.time }))
+          : []
+      );
+    } catch (err) {
+      setAvailabilityError('Unable to connect to the server. Please try again.');
+    } finally {
+      setAvailabilityLoading(false);
+    }
+  };
+
+  // Save weekly availability
+  const saveAvailability = async () => {
+    setAvailabilitySaving(true);
+    setAvailabilityError('');
+    setAvailabilityMessage('');
+
+    try {
+      const response = await fetch(
+        'http://localhost:5000/api/users/doctor/availability',
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ weeklyAvailability }),
+        }
+      );
+
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setAvailabilityError(data.message || 'Unable to save availability.');
+        return;
+      }
+
+      setAvailabilityMessage(data.message || 'Availability updated successfully.');
+      setWeeklyAvailability(
+        Array.isArray(data.weeklyAvailability)
+          ? data.weeklyAvailability.map((s) => ({ day: s.day, time: s.time }))
+          : weeklyAvailability
+      );
+    } catch (err) {
+      setAvailabilityError('Unable to connect to the server. Please try again.');
+    } finally {
+      setAvailabilitySaving(false);
+    }
+  };
+
   useEffect(() => {
-    if (view === 'appointments') {
+    if (view === 'appointments' || view === 'prescriptionPatients') {
       fetchAppointments();
+    } else if (view === 'doctorProfile') {
+      fetchDoctorProfile();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -281,6 +425,9 @@ export default function DoctorDashboard({ user, onLogout }) {
         <button
           type="button"
           className="doctor-feature-card"
+          onClick={() =>
+            changeView('doctorProfile')
+          }
         >
           <div className="doctor-card-icon">
             <DoctorIcon />
@@ -322,21 +469,23 @@ export default function DoctorDashboard({ user, onLogout }) {
           </div>
         </button>
 
-        {/* HOSPITAL SERVICES */}
+        {/* PRESCRIPTIONS */}
 
         <button
           type="button"
           className="doctor-feature-card"
+          onClick={() =>
+            changeView('prescriptionPatients')
+          }
         >
           <div className="doctor-card-icon">
             <HospitalIcon />
           </div>
 
-          <h3>Hospital Services</h3>
+          <h3>Prescriptions</h3>
 
           <p>
-            Use MediFlow to access the hospital functions
-            assigned to doctors.
+            Manage weekly patient prescriptions and prescribed medicines.
           </p>
 
           <div className="doctor-card-arrow">
@@ -465,6 +614,628 @@ export default function DoctorDashboard({ user, onLogout }) {
   );
 
   // =========================================================
+  // DOCTOR PROFILE & SCHEDULE
+  // =========================================================
+
+  const handleAvailabilityDayChange = (index, value) => {
+    setWeeklyAvailability((prev) =>
+      prev.map((slot, i) =>
+        i === index ? { ...slot, day: value } : slot
+      )
+    );
+  };
+
+  const handleAvailabilityTimeChange = (index, value) => {
+    setWeeklyAvailability((prev) =>
+      prev.map((slot, i) =>
+        i === index ? { ...slot, time: value } : slot
+      )
+    );
+  };
+
+  const removeAvailabilityRow = (index) => {
+    setWeeklyAvailability((prev) =>
+      prev.filter((_, i) => i !== index)
+    );
+  };
+
+  const addAvailabilityRow = () => {
+    setWeeklyAvailability((prev) => [
+      ...prev,
+      { day: '', time: '' },
+    ]);
+  };
+
+  const renderDoctorProfile = () => (
+    <section className="dps-page">
+
+      <div className="doctor-section-heading">
+        <p>DOCTOR WORKSPACE</p>
+        <h2>Doctor Profile &amp; Schedule</h2>
+        <span>
+          View your professional information and manage your weekly availability.
+        </span>
+      </div>
+
+      {availabilityLoading ? (
+        <div className="doctor-empty-state">
+          Loading profile...
+        </div>
+      ) : (
+        <>
+          {/* DOCTOR INFORMATION CARD */}
+          <div className="dps-info-card">
+            <h3 className="dps-card-title">Doctor Information</h3>
+
+            <div className="dps-info-grid">
+              <div className="dps-info-row">
+                <span>Doctor ID</span>
+                <strong>{doctorProfile?.userId || user.userId}</strong>
+              </div>
+
+              <div className="dps-info-row">
+                <span>Name</span>
+                <strong>{doctorProfile?.name || user.name}</strong>
+              </div>
+
+              <div className="dps-info-row">
+                <span>Email</span>
+                <strong>{doctorProfile?.email || user.email || 'N/A'}</strong>
+              </div>
+
+              <div className="dps-info-row">
+                <span>Specialization</span>
+                <strong>{doctorProfile?.specialization || 'N/A'}</strong>
+              </div>
+
+              <div className="dps-info-row">
+                <span>Account Status</span>
+                <strong>
+                  <span
+                    className={
+                      (doctorProfile?.isActive !== false)
+                        ? 'dps-status active'
+                        : 'dps-status inactive'
+                    }
+                  >
+                    {(doctorProfile?.isActive !== false)
+                      ? '● Active'
+                      : '● Inactive'}
+                  </span>
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          {/* WEEKLY AVAILABILITY CARD */}
+          <div className="dps-availability-card">
+            <h3 className="dps-card-title">Weekly Availability</h3>
+            <p className="dps-card-subtitle">
+              Set the weekly times when Patients can request appointments with you.
+            </p>
+
+            {availabilityError && (
+              <div className="doctor-message error">
+                {availabilityError}
+              </div>
+            )}
+
+            {availabilityMessage && (
+              <div className="doctor-message success">
+                {availabilityMessage}
+              </div>
+            )}
+
+            {weeklyAvailability.length === 0 ? (
+              <div className="dps-empty-state">
+                No weekly availability configured.
+              </div>
+            ) : (
+              <table className="dps-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {weeklyAvailability.map((slot, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>
+                        <select
+                          className="dps-day-select"
+                          value={slot.day}
+                          onChange={(e) =>
+                            handleAvailabilityDayChange(
+                              index,
+                              e.target.value
+                            )
+                          }
+                        >
+                          <option value="">Select day</option>
+                          <option value="Monday">Monday</option>
+                          <option value="Tuesday">Tuesday</option>
+                          <option value="Wednesday">Wednesday</option>
+                          <option value="Thursday">Thursday</option>
+                          <option value="Friday">Friday</option>
+                          <option value="Saturday">Saturday</option>
+                          <option value="Sunday">Sunday</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="time"
+                          className="dps-time-input"
+                          value={slot.time}
+                          onChange={(e) =>
+                            handleAvailabilityTimeChange(
+                              index,
+                              e.target.value
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="dps-remove-btn"
+                          onClick={() =>
+                            removeAvailabilityRow(index)
+                          }
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <div className="dps-actions">
+              <button
+                type="button"
+                className="dps-add-btn"
+                onClick={addAvailabilityRow}
+              >
+                + Add Availability
+              </button>
+
+              <button
+                type="button"
+                className="dps-save-btn"
+                onClick={saveAvailability}
+                disabled={availabilitySaving}
+              >
+                {availabilitySaving
+                  ? 'Saving...'
+                  : 'Save Availability'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+    </section>
+  );
+
+  // =========================================================
+  // WEEKLY PATIENTS FOR PRESCRIPTIONS HANDLERS
+  // =========================================================
+
+  const openPrescriptionModal = (appt) => {
+    setSelectedPrescriptionAppointment(appt);
+    setPrescriptionMedicines([
+      { medication: '', dosage: '', instructions: '' },
+    ]);
+    setPrescriptionModalError('');
+    setPrescriptionModalOpen(true);
+  };
+
+  const closePrescriptionModal = () => {
+    setPrescriptionModalOpen(false);
+    setSelectedPrescriptionAppointment(null);
+    setPrescriptionMedicines([
+      { medication: '', dosage: '', instructions: '' },
+    ]);
+    setPrescriptionModalError('');
+  };
+
+  const addMedicineRow = () => {
+    setPrescriptionMedicines((prev) => [
+      ...prev,
+      { medication: '', dosage: '', instructions: '' },
+    ]);
+  };
+
+  const removeMedicineRow = (index) => {
+    setPrescriptionMedicines((prev) => {
+      if (prev.length <= 1) return prev;
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const handleMedicineChange = (index, field, value) => {
+    setPrescriptionMedicines((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
+    );
+  };
+
+  const savePrescription = async () => {
+    setPrescriptionModalError('');
+    setPrescriptionError('');
+
+    const hasEmptyField = prescriptionMedicines.some(
+      (m) => !m.medication.trim() || !m.dosage.trim() || !m.instructions.trim()
+    );
+
+    if (hasEmptyField) {
+      setPrescriptionModalError('Please complete all medicine details.');
+      return;
+    }
+
+    setPrescriptionSaving(true);
+
+    try {
+      for (const med of prescriptionMedicines) {
+        const res = await fetch('http://localhost:5000/api/prescriptions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            appointmentId: selectedPrescriptionAppointment?._id,
+            patientUserId: selectedPrescriptionAppointment.patientUserId,
+            medication: med.medication.trim(),
+            dosage: med.dosage.trim(),
+            instructions: med.instructions.trim(),
+          }),
+        });
+
+        if (res.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          onLogout();
+          return;
+        }
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || 'Unable to save prescription.');
+        }
+      }
+
+      closePrescriptionModal();
+      setPrescriptionMessage('Prescription saved successfully.');
+    } catch (err) {
+      setPrescriptionModalError(
+        err.message || 'Unable to save prescription. Please try again.'
+      );
+    } finally {
+      setPrescriptionSaving(false);
+    }
+  };
+
+  // =========================================================
+  // WEEKLY PATIENTS FOR PRESCRIPTIONS VIEW
+  // =========================================================
+
+  const renderWeeklyPrescriptionPatients = () => {
+    const weeklyApprovedAppointments = appointments.filter((appt) => {
+      return (
+        appt.status === 'approved' &&
+        isDateInCurrentWeek(appt.appointmentDate)
+      );
+    });
+
+    const PAGE_SIZE = 7;
+    const totalPages =
+      Math.ceil(weeklyApprovedAppointments.length / PAGE_SIZE) || 1;
+    const currentPage = Math.min(prescriptionPatientPage, totalPages);
+    const pagedAppointments = weeklyApprovedAppointments.slice(
+      (currentPage - 1) * PAGE_SIZE,
+      currentPage * PAGE_SIZE
+    );
+
+    return (
+      <section className="wps-page">
+        <div className="wps-header-row">
+          <div className="doctor-section-heading">
+            <p>PRESCRIPTIONS</p>
+            <h2>Weekly Patients for Prescriptions</h2>
+            <span>
+              View this week's appointed patients and add prescriptions.
+            </span>
+          </div>
+
+          <div className="wps-week-label">
+            {formatWeekRangeDisplay()}
+          </div>
+        </div>
+
+        {prescriptionError && (
+          <div className="doctor-message error">
+            {prescriptionError}
+          </div>
+        )}
+
+        {prescriptionMessage && (
+          <div className="doctor-message success">
+            {prescriptionMessage}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="doctor-empty-state">
+            Loading appointments...
+          </div>
+        ) : weeklyApprovedAppointments.length === 0 ? (
+          <div className="wps-card">
+            <div className="doctor-empty-state">
+              No approved patient appointments for this week.
+            </div>
+          </div>
+        ) : (
+          <div className="wps-card">
+            <table className="wps-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Appointment Date &amp; Time</th>
+                  <th>Patient ID</th>
+                  <th>Patient Name</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedAppointments.map((appt, idx) => {
+                  const rowNumber = (currentPage - 1) * PAGE_SIZE + idx + 1;
+                  return (
+                    <tr key={appt._id}>
+                      <td>{rowNumber}</td>
+                      <td>
+                        {new Date(appt.appointmentDate).toLocaleString()}
+                      </td>
+                      <td>{appt.patientUserId}</td>
+                      <td>{appt.patientName || appt.patientUserId}</td>
+                      <td>{appt.reason}</td>
+                      <td>
+                        <span className="wps-status approved">
+                          Approved
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="wps-add-prescription-btn"
+                          onClick={() => openPrescriptionModal(appt)}
+                        >
+                          Add Prescription
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {totalPages > 1 && (
+              <div className="wps-pagination">
+                <button
+                  type="button"
+                  className="wps-page-btn"
+                  disabled={currentPage === 1}
+                  onClick={() =>
+                    setPrescriptionPatientPage((p) => Math.max(1, p - 1))
+                  }
+                >
+                  Previous
+                </button>
+
+                <span className="wps-page-info">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  className="wps-page-btn"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setPrescriptionPatientPage((p) =>
+                      Math.min(totalPages, p + 1)
+                    )
+                  }
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* MODAL */}
+        {prescriptionModalOpen && selectedPrescriptionAppointment && (
+          <div
+            className="wps-modal-overlay"
+            onClick={closePrescriptionModal}
+          >
+            <div
+              className="wps-modal"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="wps-modal-title"
+            >
+              <div className="wps-modal-header">
+                <h3 id="wps-modal-title">Add Prescription</h3>
+                <button
+                  type="button"
+                  className="wps-modal-close"
+                  onClick={closePrescriptionModal}
+                  aria-label="Close"
+                >
+                  &times;
+                </button>
+              </div>
+
+              <div className="wps-patient-summary">
+                <div className="wps-summary-item">
+                  <span className="wps-summary-label">Patient:</span>
+                  <span className="wps-summary-value">
+                    {selectedPrescriptionAppointment.patientName ||
+                      selectedPrescriptionAppointment.patientUserId}{' '}
+                    ({selectedPrescriptionAppointment.patientUserId})
+                  </span>
+                </div>
+
+                <div className="wps-summary-item">
+                  <span className="wps-summary-label">Appointment:</span>
+                  <span className="wps-summary-value">
+                    {new Date(
+                      selectedPrescriptionAppointment.appointmentDate
+                    ).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="wps-summary-item">
+                  <span className="wps-summary-label">Reason:</span>
+                  <span className="wps-summary-value">
+                    {selectedPrescriptionAppointment.reason}
+                  </span>
+                </div>
+              </div>
+
+              {prescriptionModalError && (
+                <div className="doctor-message error">
+                  {prescriptionModalError}
+                </div>
+              )}
+
+              <div className="wps-modal-body">
+                <div className="wps-table-heading">
+                  Prescription Details
+                </div>
+
+                <table className="wps-medicine-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Medicine Name</th>
+                      <th>Dosage</th>
+                      <th>Instructions</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {prescriptionMedicines.map((row, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <input
+                            type="text"
+                            className="wps-medicine-input"
+                            placeholder="e.g. Paracetamol"
+                            value={row.medication}
+                            onChange={(e) =>
+                              handleMedicineChange(
+                                index,
+                                'medication',
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            className="wps-medicine-input"
+                            placeholder="e.g. 500 mg"
+                            value={row.dosage}
+                            onChange={(e) =>
+                              handleMedicineChange(
+                                index,
+                                'dosage',
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            className="wps-medicine-input"
+                            placeholder="e.g. Twice daily after meals"
+                            value={row.instructions}
+                            onChange={(e) =>
+                              handleMedicineChange(
+                                index,
+                                'instructions',
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            className="wps-remove-medicine-btn"
+                            disabled={prescriptionMedicines.length <= 1}
+                            onClick={() => removeMedicineRow(index)}
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                <div className="wps-add-medicine-row">
+                  <button
+                    type="button"
+                    className="wps-add-medicine-btn"
+                    onClick={addMedicineRow}
+                  >
+                    + Add Another Medicine
+                  </button>
+                </div>
+              </div>
+
+              <div className="wps-modal-actions">
+                <button
+                  type="button"
+                  className="wps-cancel-btn"
+                  onClick={closePrescriptionModal}
+                  disabled={prescriptionSaving}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  className="wps-save-btn"
+                  onClick={savePrescription}
+                  disabled={prescriptionSaving}
+                >
+                  {prescriptionSaving
+                    ? 'Saving...'
+                    : 'Save Prescription'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  };
+
+  // =========================================================
   // CONTENT
   // =========================================================
 
@@ -472,6 +1243,12 @@ export default function DoctorDashboard({ user, onLogout }) {
     switch (view) {
       case 'appointments':
         return renderAppointments();
+
+      case 'doctorProfile':
+        return renderDoctorProfile();
+
+      case 'prescriptionPatients':
+        return renderWeeklyPrescriptionPatients();
 
       default:
         return renderHome();
@@ -535,7 +1312,14 @@ export default function DoctorDashboard({ user, onLogout }) {
 
           <button
             type="button"
-            className="doctor-nav-btn"
+            onClick={() =>
+              changeView('prescriptionPatients')
+            }
+            className={
+              view === 'prescriptionPatients'
+                ? 'doctor-nav-btn active'
+                : 'doctor-nav-btn'
+            }
           >
             Prescriptions
           </button>

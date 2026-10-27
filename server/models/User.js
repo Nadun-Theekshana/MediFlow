@@ -74,7 +74,31 @@ const userSchema = new mongoose.Schema({
     },
     availabilityTime: {
         type: String
-    }
+    },
+    weeklyAvailability: [
+        new mongoose.Schema(
+            {
+                day: {
+                    type: String,
+                    enum: [
+                        'Monday',
+                        'Tuesday',
+                        'Wednesday',
+                        'Thursday',
+                        'Friday',
+                        'Saturday',
+                        'Sunday'
+                    ],
+                    required: true
+                },
+                time: {
+                    type: String,
+                    required: true
+                }
+            },
+            { _id: false }
+        )
+    ]
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);

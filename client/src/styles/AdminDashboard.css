@@ -151,6 +151,8 @@
 .admin-content {
   width: 100%;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 35px 5.2% 28px;
   overflow: auto;
 }
@@ -161,9 +163,10 @@
 
 .admin-home {
   width: 100%;
-  height: 100%;
   max-width: 1460px;
   margin: 0 auto;
+  flex: 1;
+  min-height: 100%;
   display: flex;
 
   flex-direction: column;
@@ -219,6 +222,10 @@
       minmax(0, 1fr));
 
   gap: 28px;
+
+  margin-top: auto;
+  margin-bottom: auto;
+  transform: translateY(-20px);
 }
 
 /* =========================================================
@@ -983,12 +990,17 @@
   }
 
   .admin-home {
+    flex: none;
     height: auto;
+    min-height: auto;
   }
 
   .admin-card-grid {
     grid-template-columns:
       1fr;
+    margin-top: 0;
+    margin-bottom: 0;
+    transform: none;
   }
 
   .admin-management-card {

@@ -96,6 +96,11 @@ export default function PatientDashboard({ user, onLogout }) {
   const [loadingAppts, setLoadingAppts] = useState(false);
   const [cancellingAppointmentId, setCancellingAppointmentId] = useState(null);
 
+  const [patientPrescriptions, setPatientPrescriptions] = useState([]);
+  const [prescriptionLoading, setPrescriptionLoading] = useState(false);
+  const [prescriptionError, setPrescriptionError] = useState('');
+  const [prescriptionDoctorFilter, setPrescriptionDoctorFilter] = useState('all');
+
   const token = sessionStorage.getItem('token');
 
   // ---------------------------------------------------------------------------
@@ -116,6 +121,9 @@ export default function PatientDashboard({ user, onLogout }) {
 
   const changeView = (newView) => {
     setMsg({ type: '', text: '' });
+    if (newView === 'prescriptions') {
+      setPrescriptionDoctorFilter('all');
+    }
     setView(newView);
   };
 
@@ -407,11 +415,46 @@ export default function PatientDashboard({ user, onLogout }) {
     }
   };
 
+  const fetchPatientPrescriptions = async () => {
+    setPrescriptionLoading(true);
+    setPrescriptionError('');
+    try {
+      const res = await fetch('http://localhost:5000/api/prescriptions/patient', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+
+      const data = await res.json();
+      if (!res.ok) {
+        setPrescriptionError(
+          data.message || 'Unable to load prescriptions. Please try again.'
+        );
+        return;
+      }
+
+      setPatientPrescriptions(data.prescriptions || []);
+    } catch (err) {
+      setPrescriptionError('Unable to load prescriptions. Please try again.');
+    } finally {
+      setPrescriptionLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (view === 'appointments') {
       fetchAppointments();
     } else if (view === 'request') {
       fetchAppointmentDoctors();
+    } else if (view === 'prescriptions') {
+      fetchPatientPrescriptions();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -456,6 +499,16 @@ export default function PatientDashboard({ user, onLogout }) {
       <path
         className="heart-pulse"
         d="M14 31h10l4-8 7 17 5-10 4 3h7"
+      />
+    </svg>
+  );
+
+  const PrescriptionIcon = () => (
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M14 8h24l14 14v34H14z" />
+      <path
+        className="doc-symbol"
+        d="M26 34h12M32 28v12M24 48h16"
       />
     </svg>
   );
@@ -515,16 +568,16 @@ export default function PatientDashboard({ user, onLogout }) {
         <button
           type="button"
           className="patient-feature-card"
-          onClick={() => changeView('healthtips')}
+          onClick={() => changeView('prescriptions')}
         >
           <div className="feature-icon">
-            <HeartIcon />
+            <PrescriptionIcon />
           </div>
 
-          <h3>Health Tips</h3>
+          <h3>Prescriptions</h3>
 
           <p>
-            Get simple tips for a healthier you.
+            View prescriptions added by your doctors.
           </p>
         </button>
 
@@ -545,9 +598,23 @@ export default function PatientDashboard({ user, onLogout }) {
       (doc) => doc.userId === selectedDoctorUserId
     );
 
-    const activeSlot = selectedDoctor
-      ? buildNextDoctorSlot(selectedDoctor.availabilityDay, selectedDoctor.availabilityTime)
-      : null;
+    // Build all upcoming slots from doctor's weeklyAvailability
+    const availableSlots = [];
+    if (selectedDoctor && Array.isArray(selectedDoctor.weeklyAvailability)) {
+      for (const slot of selectedDoctor.weeklyAvailability) {
+        const nextDate = buildNextDoctorSlot(slot.day, slot.time);
+        if (nextDate) {
+          availableSlots.push(nextDate);
+        }
+      }
+      // Sort earliest date first
+      availableSlots.sort((a, b) => a.getTime() - b.getTime());
+    }
+
+    const hasNoAvailability =
+      selectedDoctor &&
+      (!selectedDoctor.weeklyAvailability ||
+        selectedDoctor.weeklyAvailability.length === 0);
 
     return (
       <section className="patient-page-section">
@@ -633,15 +700,19 @@ export default function PatientDashboard({ user, onLogout }) {
               className="patient-appointment-select"
               value={selectedAppointmentSlot}
               onChange={(e) => setSelectedAppointmentSlot(e.target.value)}
-              disabled={!selectedDoctorUserId}
+              disabled={!selectedDoctorUserId || hasNoAvailability}
               required
             >
-              <option value="">Select available date & time</option>
-              {activeSlot && (
-                <option value={activeSlot.toISOString()}>
-                  {formatSlotDisplay(activeSlot)}
+              <option value="">
+                {hasNoAvailability
+                  ? 'No available appointment times'
+                  : 'Select available date & time'}
+              </option>
+              {availableSlots.map((slot, idx) => (
+                <option key={idx} value={slot.toISOString()}>
+                  {formatSlotDisplay(slot)}
                 </option>
-              )}
+              ))}
             </select>
           </div>
 
@@ -886,6 +957,187 @@ export default function PatientDashboard({ user, onLogout }) {
   );
 
   // ---------------------------------------------------------------------------
+  // MY PRESCRIPTIONS (SAMPLE 2 - CARD LAYOUT GROUPED BY APPOINTMENT)
+  // ---------------------------------------------------------------------------
+
+  const groupPrescriptions = (prescriptions) => {
+    const groups = {};
+
+    prescriptions.forEach((p) => {
+      let key;
+      if (p.appointmentId) {
+        key = `appt_${p.appointmentId}`;
+      } else {
+        const dateKey = p.createdAt
+          ? new Date(p.createdAt).toISOString().split('T')[0]
+          : 'unknown-date';
+        key = `fallback_${p.doctorUserId || 'doc'}_${dateKey}`;
+      }
+
+      if (!groups[key]) {
+        const dateToUse = p.appointmentDate
+          ? new Date(p.appointmentDate)
+          : (p.createdAt ? new Date(p.createdAt) : null);
+
+        let dateMonth = 'N/A';
+        let dateDay = '--';
+        let dateYear = '----';
+
+        if (dateToUse && !isNaN(dateToUse.getTime())) {
+          dateMonth = dateToUse.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+          dateDay = dateToUse.getDate();
+          dateYear = dateToUse.getFullYear();
+        }
+
+        let appointmentTime = 'Not available';
+        if (p.appointmentDate) {
+          const apptDateObj = new Date(p.appointmentDate);
+          if (!isNaN(apptDateObj.getTime())) {
+            appointmentTime = apptDateObj.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            });
+          }
+        }
+
+        const rawDoctorName = p.doctorName || 'Doctor';
+        const formattedDoctorName =
+          rawDoctorName.startsWith('Dr.') || rawDoctorName.startsWith('Dr ')
+            ? rawDoctorName
+            : `Dr. ${rawDoctorName}`;
+
+        groups[key] = {
+          id: key,
+          appointmentId: p.appointmentId,
+          doctorUserId: p.doctorUserId,
+          doctorName: formattedDoctorName,
+          doctorSpecialization: p.doctorSpecialization || 'Doctor',
+          appointmentDate: p.appointmentDate,
+          appointmentTime,
+          appointmentReason: p.appointmentReason || 'Not available',
+          createdAt: p.createdAt,
+          dateMonth,
+          dateDay,
+          dateYear,
+          sortTimestamp: p.appointmentDate
+            ? new Date(p.appointmentDate).getTime()
+            : (p.createdAt ? new Date(p.createdAt).getTime() : 0),
+          medicines: [],
+        };
+      }
+
+      groups[key].medicines.push({
+        _id: p._id,
+        medication: p.medication,
+        dosage: p.dosage,
+        instructions: p.instructions,
+      });
+    });
+
+    return Object.values(groups).sort(
+      (a, b) => b.sortTimestamp - a.sortTimestamp
+    );
+  };
+
+  const renderPrescriptions = () => {
+    const allCards = groupPrescriptions(patientPrescriptions);
+    const doctorOptions = [...new Set(allCards.map((c) => c.doctorName))];
+    const displayedCards =
+      prescriptionDoctorFilter === 'all'
+        ? allCards
+        : allCards.filter((c) => c.doctorName === prescriptionDoctorFilter);
+
+    return (
+      <section className="patient-page-section ppc-page">
+        <div className="section-heading ppc-heading">
+          <div>
+            <p className="section-label">PRESCRIPTIONS</p>
+            <h2>My Prescriptions</h2>
+            <p>
+              View prescriptions grouped by appointment.
+            </p>
+          </div>
+
+          {doctorOptions.length > 0 && (
+            <div className="ppc-toolbar">
+              <select
+                id="doctor-filter"
+                className="ppc-filter"
+                value={prescriptionDoctorFilter}
+                onChange={(e) => setPrescriptionDoctorFilter(e.target.value)}
+                aria-label="Filter by Doctor"
+              >
+                <option value="all">All Doctors</option>
+                {doctorOptions.map((doc) => (
+                  <option key={doc} value={doc}>
+                    {doc}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+
+        {prescriptionError && (
+          <div className="patient-message error">
+            {prescriptionError}
+          </div>
+        )}
+
+        {prescriptionLoading ? (
+          <div className="simple-state">
+            Loading prescriptions...
+          </div>
+        ) : patientPrescriptions.length === 0 ? (
+          <div className="ppc-empty">
+            <h3>No prescriptions available yet.</h3>
+            <p>Prescriptions added by your doctors will appear here.</p>
+          </div>
+        ) : displayedCards.length === 0 ? (
+          <div className="ppc-empty">
+            <h3>No prescriptions found for this doctor.</h3>
+          </div>
+        ) : (
+          <div className="ppc-list">
+            {displayedCards.map((card) => (
+              <article key={card.id} className="ppc-card">
+                <div className="ppc-date">
+                  <span className="ppc-date-month">{card.dateMonth}</span>
+                  <span className="ppc-date-day">{card.dateDay}</span>
+                  <span className="ppc-date-year">{card.dateYear}</span>
+                </div>
+
+                <div className="ppc-doctor">
+                  <h3>{card.doctorName}</h3>
+                  <div className="ppc-specialization">{card.doctorSpecialization}</div>
+                  <div className="ppc-appointment">Appointment: {card.appointmentTime}</div>
+                  <div className="ppc-reason">Reason: {card.appointmentReason}</div>
+                </div>
+
+                <div className="ppc-medicines">
+                  <ul className="ppc-medicines-list">
+                    {card.medicines.map((med, idx) => (
+                      <li key={med._id || idx} className="ppc-medicine-item">
+                        <div className="ppc-medicine-name-dosage">
+                          <span className="ppc-bullet">•</span> {med.medication} - {med.dosage}
+                        </div>
+                        <div className="ppc-medicine-instructions">
+                          {med.instructions}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  };
+
+  // ---------------------------------------------------------------------------
   // PAGE CONTENT
   // ---------------------------------------------------------------------------
 
@@ -899,6 +1151,9 @@ export default function PatientDashboard({ user, onLogout }) {
 
       case 'profile':
         return renderProfile();
+
+      case 'prescriptions':
+        return renderPrescriptions();
 
       case 'healthtips':
         return renderHealthTips();

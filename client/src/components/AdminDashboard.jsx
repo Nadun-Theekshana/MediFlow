@@ -15,17 +15,21 @@ export default function AdminDashboard({ user, onLogout }) {
 
   // Doctor form
   const [docId, setDocId] = useState('');
+  const [docIdLoading, setDocIdLoading] = useState(false);
+  const [docIdError, setDocIdError] = useState('');
   const [docName, setDocName] = useState('');
   const [docEmail, setDocEmail] = useState('');
-  const [docPassword, setDocPassword] = useState('');
+  const [docPassword, setDocPassword] = useState('1234');
   const [specialization, setSpecialization] = useState('');
   const [docLoading, setDocLoading] = useState(false);
 
   // Patient form
   const [patId, setPatId] = useState('');
+  const [patIdLoading, setPatIdLoading] = useState(false);
+  const [patIdError, setPatIdError] = useState('');
   const [patName, setPatName] = useState('');
   const [patEmail, setPatEmail] = useState('');
-  const [patPassword, setPatPassword] = useState('');
+  const [patPassword, setPatPassword] = useState('1234');
   const [patLoading, setPatLoading] = useState(false);
 
   // Doctor management state
@@ -89,10 +93,107 @@ const itemsPerPage = 7; // patients per page
     setView(newView);
   };
 
-  // Fetch doctors when doctorManagement view is active
+  const fetchNextDoctorId = async () => {
+    setDocIdLoading(true);
+    setDocIdError('');
+    try {
+      const res = await fetch('http://localhost:5000/api/users/next-doctor-id', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const errorMsg = data.message || 'Unable to load next Doctor ID.';
+        setDocIdError(errorMsg);
+        setMsg(errorMsg);
+        setMsgType('error');
+        setDocId('');
+        return;
+      }
+      const data = await res.json();
+      if (data.nextDoctorId) {
+        setDocId(data.nextDoctorId);
+      } else {
+        const errorMsg = 'Unable to generate next Doctor ID.';
+        setDocIdError(errorMsg);
+        setMsg(errorMsg);
+        setMsgType('error');
+        setDocId('');
+      }
+    } catch (e) {
+      const errorMsg = 'Unable to connect to server to fetch Doctor ID.';
+      setDocIdError(errorMsg);
+      setMsg(errorMsg);
+      setMsgType('error');
+      setDocId('');
+    } finally {
+      setDocIdLoading(false);
+    }
+  };
+
+  const fetchNextPatientId = async () => {
+    setPatIdLoading(true);
+    setPatIdError('');
+    try {
+      const res = await fetch('http://localhost:5000/api/users/next-patient-id', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const errorMsg = data.message || 'Unable to load next Patient ID.';
+        setPatIdError(errorMsg);
+        setMsg(errorMsg);
+        setMsgType('error');
+        setPatId('');
+        return;
+      }
+      const data = await res.json();
+      if (data.nextPatientId) {
+        setPatId(data.nextPatientId);
+      } else {
+        const errorMsg = 'Unable to generate next Patient ID.';
+        setPatIdError(errorMsg);
+        setMsg(errorMsg);
+        setMsgType('error');
+        setPatId('');
+      }
+    } catch (e) {
+      const errorMsg = 'Unable to connect to server to fetch Patient ID.';
+      setPatIdError(errorMsg);
+      setMsg(errorMsg);
+      setMsgType('error');
+      setPatId('');
+    } finally {
+      setPatIdLoading(false);
+    }
+  };
+
+  // Fetch data based on active view
   useEffect(() => {
-    // Fetch data based on active view
-    if (view === 'doctorManagement') {
+    if (view === 'doctor') {
+      setDocPassword('1234');
+      fetchNextDoctorId();
+    } else if (view === 'patient') {
+      setPatPassword('1234');
+      fetchNextPatientId();
+    } else if (view === 'doctorManagement') {
       const fetchDoctors = async () => {
         setDoctorsLoading(true);
         setDoctorsError('');
@@ -228,14 +329,14 @@ const itemsPerPage = 7; // patients per page
 
         onLogout();
 
-        return false;
+        return null;
       }
 
       if (res.status === 403) {
         setMsg('You are not authorized to perform this action.');
         setMsgType('error');
 
-        return false;
+        return null;
       }
 
       const data = await res.json();
@@ -244,18 +345,15 @@ const itemsPerPage = 7; // patients per page
         setMsg(data.message || 'Request failed.');
         setMsgType('error');
 
-        return false;
+        return null;
       }
 
-      setMsg(data.message || 'Account added successfully.');
-      setMsgType('success');
-
-      return true;
+      return { success: true, user: data.user, message: data.message };
     } catch (error) {
       setMsg('Unable to connect to the server. Please try again.');
       setMsgType('error');
 
-      return false;
+      return null;
     } finally {
       setLoading(false);
     }
@@ -269,6 +367,18 @@ const itemsPerPage = 7; // patients per page
     e.preventDefault();
 
     resetMsg();
+
+    if (docIdLoading || !docId) {
+      setMsg('Doctor User ID is not available. Please wait or refresh.');
+      setMsgType('error');
+      return;
+    }
+
+    if (docIdError) {
+      setMsg(docIdError);
+      setMsgType('error');
+      return;
+    }
 
     const doctorId = docId.trim();
     const doctorName = docName.trim();
@@ -304,20 +414,22 @@ const itemsPerPage = 7; // patients per page
       specialization: doctorSpecialization,
     };
 
-    const success = await apiRequest(
+    const resData = await apiRequest(
       payload,
       setDocLoading
     );
 
-    if (success) {
-      setDocId('');
+    if (resData && resData.success) {
+      const createdId = resData.user?.userId || doctorId;
       setDocName('');
       setDocEmail('');
-      setDocPassword('');
+      setDocPassword('1234');
       setSpecialization('');
 
-      setMsg('Doctor account added successfully.');
+      setMsg(`Doctor ${createdId} successfully created.`);
       setMsgType('success');
+
+      fetchNextDoctorId();
     }
   };
 
@@ -329,6 +441,18 @@ const itemsPerPage = 7; // patients per page
     e.preventDefault();
 
     resetMsg();
+
+    if (patIdLoading || !patId) {
+      setMsg('Patient User ID is not available. Please wait or refresh.');
+      setMsgType('error');
+      return;
+    }
+
+    if (patIdError) {
+      setMsg(patIdError);
+      setMsgType('error');
+      return;
+    }
 
     const patientId = patId.trim();
     const patientName = patName.trim();
@@ -361,19 +485,21 @@ const itemsPerPage = 7; // patients per page
       role: 'patient',
     };
 
-    const success = await apiRequest(
+    const resData = await apiRequest(
       payload,
       setPatLoading
     );
 
-    if (success) {
-      setPatId('');
+    if (resData && resData.success) {
+      const createdId = resData.user?.userId || patientId;
       setPatName('');
       setPatEmail('');
-      setPatPassword('');
+      setPatPassword('1234');
 
-      setMsg('Patient account added successfully.');
+      setMsg(`Patient ${createdId} successfully created.`);
       setMsgType('success');
+
+      fetchNextPatientId();
     }
   };
 
@@ -619,10 +745,9 @@ const itemsPerPage = 7; // patients per page
           <input
             id="doctorId"
             type="text"
-            value={docId}
-            onChange={(e) =>
-              setDocId(e.target.value)
-            }
+            value={docIdLoading ? 'Loading...' : docId}
+            readOnly
+            autoComplete="off"
             placeholder="e.g. D001"
             required
           />
@@ -722,7 +847,7 @@ const itemsPerPage = 7; // patients per page
         <button
           type="submit"
           className="admin-primary-btn"
-          disabled={docLoading}
+          disabled={docLoading || docIdLoading || !docId || !!docIdError}
         >
           {docLoading
             ? 'Adding...'
@@ -760,11 +885,10 @@ const itemsPerPage = 7; // patients per page
           <input
             id="patientId"
             type="text"
-            value={patId}
-            onChange={(e) =>
-              setPatId(e.target.value)
-            }
-            placeholder="e.g. P001"
+            value={patIdLoading ? 'Loading...' : patId}
+            readOnly
+            autoComplete="off"
+            placeholder="e.g. P0001"
             required
           />
         </div>
@@ -823,7 +947,7 @@ const itemsPerPage = 7; // patients per page
         <button
           type="submit"
           className="admin-primary-btn"
-          disabled={patLoading}
+          disabled={patLoading || patIdLoading || !patId || !!patIdError}
         >
           {patLoading
             ? 'Adding...'

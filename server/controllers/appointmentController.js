@@ -44,7 +44,17 @@ const getDoctorAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find({ doctorUserId: req.user.userId })
       .sort({ appointmentDate: -1 });
-    res.json({ appointments });
+
+    const patientIds = [...new Set(appointments.map((a) => a.patientUserId))];
+    const patients = await User.find({ userId: { $in: patientIds } }).select('userId name');
+    const patientMap = Object.fromEntries(patients.map((p) => [p.userId, p.name]));
+
+    const enriched = appointments.map((a) => ({
+      ...a.toObject(),
+      patientName: patientMap[a.patientUserId] || 'Unknown Patient'
+    }));
+
+    res.json({ appointments: enriched });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
