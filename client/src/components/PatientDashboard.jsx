@@ -1,3 +1,4 @@
+// PatientDashboard component: patient interface for appointments and prescriptions
 // src/components/PatientDashboard.jsx
 
 import { useEffect, useState } from 'react';

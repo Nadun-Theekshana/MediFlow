@@ -1,3 +1,5 @@
+// Middleware to protect routes using JWT authentication
+// It verifies the token and adds user info to req.user
 const jwt = require('jsonwebtoken');
 
 const protect = (req, res, next) => {

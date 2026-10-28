@@ -1,10 +1,12 @@
 // src/components/DoctorDashboard.jsx
+// Doctor dashboard: view/manage appointments, schedule, and prescriptions
 
 import { useEffect, useState } from 'react';
 import '../styles/DoctorDashboard.css';
 import { API_BASE_URL } from '../config/api';
 
 // Helpers for current calendar week (Monday 00:00:00.000 to Sunday 23:59:59.999)
+// Helper: get date range for current week (Monday to Sunday)
 function getCurrentWeekRange() {
   const now = new Date();
   const day = now.getDay(); // 0: Sun, 1: Mon, ..., 6: Sat
@@ -21,6 +23,7 @@ function getCurrentWeekRange() {
   return { monday, sunday };
 }
 
+// Helper: check if a date is within the current week
 function isDateInCurrentWeek(dateInput) {
   const d = new Date(dateInput);
   if (isNaN(d.getTime())) return false;

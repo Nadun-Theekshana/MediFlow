@@ -1,3 +1,4 @@
+// Load environment variables from .env file
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -9,7 +10,8 @@ const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Database connection middleware for MongoDB-dependent routes
+// Middleware to ensure MongoDB connection before handling routes
+// Ensure DB connection before handling routes
 const ensureDbConnected = async (req, res, next) => {
     try {
         await connectDB();

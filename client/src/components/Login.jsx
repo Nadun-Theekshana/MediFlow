@@ -1,3 +1,4 @@
+// Login component for MediFlow application
 // src/components/Login.jsx
 
 import { useState, useEffect } from 'react';

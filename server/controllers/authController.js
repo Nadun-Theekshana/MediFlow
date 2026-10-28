@@ -1,3 +1,5 @@
+// Controller for authentication actions
+// Handles user login and JWT token generation
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');

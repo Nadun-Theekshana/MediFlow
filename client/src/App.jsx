@@ -1,3 +1,5 @@
+// Root component: handles authentication and renders the appropriate dashboard
+// Main entry component for MediFlow app
 import { useState } from 'react';
 import Login from './components/Login.jsx';
 import './App.css';
@@ -12,6 +14,7 @@ function App() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+// Handle successful login, store user data in state
   const handleLoginSuccess = (loggedUser) => {
     setUser(loggedUser);
     setError('');
@@ -23,7 +26,8 @@ function App() {
     setUser(null);
   };
 
-  const handleLogin = async (e) => {
+  // Handle login form submission and call backend API
+const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     const userId = e.target.userId.value.trim();

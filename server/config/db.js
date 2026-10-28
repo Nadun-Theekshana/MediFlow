@@ -1,3 +1,4 @@
+// Import Mongoose ODM for MongoDB
 const mongoose = require('mongoose');
 
 let cached = global.mongoose;

@@ -1,9 +1,11 @@
 // src/components/AdminDashboard.jsx
 
+// Admin dashboard component: manage doctors, patients, and appointments
 import { useState, useEffect } from 'react';
 import '../styles/AdminDashboard.css';
 import { API_BASE_URL } from '../config/api';
 
+// AdminDashboard component: main admin interface
 export default function AdminDashboard({ user, onLogout }) {
   // =========================================================
   // STATE
