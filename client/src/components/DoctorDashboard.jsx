@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import '../styles/DoctorDashboard.css';
+import { API_BASE_URL } from '../config/api';
 
 // Helpers for current calendar week (Monday 00:00:00.000 to Sunday 23:59:59.999)
 function getCurrentWeekRange() {
@@ -106,7 +107,7 @@ export default function DoctorDashboard({ user, onLogout }) {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/appointments/doctor',
+        `${API_BASE_URL}/api/appointments/doctor`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -165,7 +166,7 @@ export default function DoctorDashboard({ user, onLogout }) {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/appointments/${id}/status`,
+        `${API_BASE_URL}/api/appointments/${id}/status`,
         {
           method: 'PATCH',
 
@@ -238,7 +239,7 @@ export default function DoctorDashboard({ user, onLogout }) {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/users/doctor/profile',
+        `${API_BASE_URL}/api/users/doctor/profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -281,7 +282,7 @@ export default function DoctorDashboard({ user, onLogout }) {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/users/doctor/availability',
+        `${API_BASE_URL}/api/users/doctor/availability`,
         {
           method: 'PATCH',
           headers: {
@@ -881,7 +882,7 @@ export default function DoctorDashboard({ user, onLogout }) {
 
     try {
       for (const med of prescriptionMedicines) {
-        const res = await fetch('http://localhost:5000/api/prescriptions', {
+        const res = await fetch(`${API_BASE_URL}/api/prescriptions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

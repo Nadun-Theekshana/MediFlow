@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import '../styles/Login.css';
+import { API_BASE_URL } from '../config/api';
 
 export default function Login({ onLoginSuccess }) {
   // ---------------------------------------------------------------------------
@@ -42,7 +43,7 @@ export default function Login({ onLoginSuccess }) {
       try {
         setPatientIdLoading(true);
         setPatientIdError('');
-        const response = await fetch('http://localhost:5000/api/users/next-patient-id');
+        const response = await fetch(`${API_BASE_URL}/api/users/next-patient-id`);
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data.message || 'Unable to generate Patient ID.');
@@ -99,7 +100,7 @@ export default function Login({ onLoginSuccess }) {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: trimmedUserId, password }),
@@ -170,7 +171,7 @@ export default function Login({ onLoginSuccess }) {
     setRegistrationLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/users/register-patient', {
+      const res = await fetch(`${API_BASE_URL}/api/users/register-patient`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

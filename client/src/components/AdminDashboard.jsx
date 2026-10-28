@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import '../styles/AdminDashboard.css';
+import { API_BASE_URL } from '../config/api';
 
 export default function AdminDashboard({ user, onLogout }) {
   // =========================================================
@@ -97,7 +98,7 @@ const itemsPerPage = 7; // patients per page
     setDocIdLoading(true);
     setDocIdError('');
     try {
-      const res = await fetch('http://localhost:5000/api/users/next-doctor-id', {
+      const res = await fetch(`${API_BASE_URL}/api/users/next-doctor-id`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -143,7 +144,7 @@ const itemsPerPage = 7; // patients per page
     setPatIdLoading(true);
     setPatIdError('');
     try {
-      const res = await fetch('http://localhost:5000/api/users/next-patient-id', {
+      const res = await fetch(`${API_BASE_URL}/api/users/next-patient-id`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -198,7 +199,7 @@ const itemsPerPage = 7; // patients per page
         setDoctorsLoading(true);
         setDoctorsError('');
         try {
-          const res = await fetch('http://localhost:5000/api/users/doctors', {
+          const res = await fetch(`${API_BASE_URL}/api/users/doctors`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -234,7 +235,7 @@ const itemsPerPage = 7; // patients per page
         setPatientsLoading(true);
         setPatientsError('');
         try {
-          const res = await fetch('http://localhost:5000/api/users/patients', {
+          const res = await fetch(`${API_BASE_URL}/api/users/patients`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -270,7 +271,7 @@ const itemsPerPage = 7; // patients per page
         setAppointmentLoading(true);
         setAppointmentError('');
         try {
-          const res = await fetch('http://localhost:5000/api/appointments/admin', {
+          const res = await fetch(`${API_BASE_URL}/api/appointments/admin`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -312,7 +313,7 @@ const itemsPerPage = 7; // patients per page
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/users', {
+      const res = await fetch(`${API_BASE_URL}/api/users`, {
         method: 'POST',
 
         headers: {
@@ -1046,7 +1047,7 @@ const itemsPerPage = 7; // patients per page
     const encodedId = encodeURIComponent(userId);
     setStatusUpdatingId(userId);
     try {
-      const res = await fetch(`http://localhost:5000/api/users/doctors/${encodedId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/doctors/${encodedId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -1109,7 +1110,7 @@ const itemsPerPage = 7; // patients per page
     setDoctorDeletingId(userId);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${userId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1285,7 +1286,7 @@ const itemsPerPage = 7; // patients per page
 
     setPatientDeletingId(userId);
     try {
-      const res = await fetch(`http://localhost:5000/api/users/patients/${userId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/patients/${userId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1544,7 +1545,7 @@ const itemsPerPage = 7; // patients per page
       setApprovingAppointmentId(appointmentId);
       try {
         const res = await fetch(
-          `http://localhost:5000/api/appointments/${appointmentId}/admin-approve`,
+          `${API_BASE_URL}/api/appointments/${appointmentId}/admin-approve`,
           {
             method: 'PATCH',
             headers: { Authorization: `Bearer ${token}` },
@@ -1594,7 +1595,7 @@ const itemsPerPage = 7; // patients per page
         const token = sessionStorage.getItem('token');
 
         const response = await fetch(
-          `http://localhost:5000/api/appointments/${appointmentId}/admin-delete`,
+          `${API_BASE_URL}/api/appointments/${appointmentId}/admin-delete`,
           {
             method: 'DELETE',
             headers: {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import '../styles/PatientDashboard.css';
+import { API_BASE_URL } from '../config/api';
 
 const CONSULTANT_TYPES = [
   'Consultant Physician / Internal Medicine',
@@ -187,7 +188,7 @@ export default function PatientDashboard({ user, onLogout }) {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/appointments', {
+      const res = await fetch(`${API_BASE_URL}/api/appointments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -255,7 +256,7 @@ export default function PatientDashboard({ user, onLogout }) {
 
     try {
       const res = await fetch(
-        'http://localhost:5000/api/appointments/patient',
+        `${API_BASE_URL}/api/appointments/patient`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -318,7 +319,7 @@ export default function PatientDashboard({ user, onLogout }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/appointments/${appointmentId}/cancel`,
+        `${API_BASE_URL}/api/appointments/${appointmentId}/cancel`,
         {
           method: 'PATCH',
           headers: {
@@ -335,9 +336,9 @@ export default function PatientDashboard({ user, onLogout }) {
           current.map((appointment) =>
             appointment._id === appointmentId
               ? {
-                  ...appointment,
-                  status: 'cancelled',
-                }
+                ...appointment,
+                status: 'cancelled',
+              }
               : appointment
           )
         );
@@ -395,7 +396,7 @@ export default function PatientDashboard({ user, onLogout }) {
 
   const fetchAppointmentDoctors = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/users/appointment-doctors', {
+      const res = await fetch(`${API_BASE_URL}/api/users/appointment-doctors`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -419,7 +420,7 @@ export default function PatientDashboard({ user, onLogout }) {
     setPrescriptionLoading(true);
     setPrescriptionError('');
     try {
-      const res = await fetch('http://localhost:5000/api/prescriptions/patient', {
+      const res = await fetch(`${API_BASE_URL}/api/prescriptions/patient`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -674,8 +675,8 @@ export default function PatientDashboard({ user, onLogout }) {
                 {!selectedSpecialization
                   ? 'Select consultant'
                   : filteredDoctors.length === 0
-                  ? 'No available consultants for this type.'
-                  : 'Select consultant'}
+                    ? 'No available consultants for this type.'
+                    : 'Select consultant'}
               </option>
               {filteredDoctors.map((doc) => {
                 const displayName =
