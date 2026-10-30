@@ -456,6 +456,137 @@ const getNextDoctorId = async (req, res) => {
   }
 };
 
+// Calculate the next available administrator ID (e.g. A001, A002, A003)
+async function computeNextAdminId() {
+  const admins = await User.find({ role: 'admin', userId: /^A\d+$/i }).select('userId');
+  let highestNumber = 0;
+  for (const admin of admins) {
+    const match = admin.userId.match(/^A(\d+)$/i);
+    if (!match) {
+      continue;
+    }
+    const number = parseInt(match[1], 10);
+    if (Number.isFinite(number) && number > highestNumber) {
+      highestNumber = number;
+    }
+  }
+  return `A${String(highestNumber + 1).padStart(3, '0')}`;
+}
+
+// GET /api/users/next-admin-id — protected, admin only
+const getNextAdminId = async (req, res) => {
+  try {
+    const nextAdminId = await computeNextAdminId();
+    return res.status(200).json({ nextAdminId });
+  } catch (error) {
+    console.error('Next Admin ID error:', error.message);
+    return res.status(500).json({ message: 'Unable to generate Admin ID.' });
+  }
+};
+
+// POST /api/users/admin — protected, admin only
+// Allows an existing administrator to create a new administrator account
+const createAdmin = async (req, res) => {
+  try {
+    const { userId, name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    const trimmedName = String(name).trim();
+    const trimmedEmail = String(email).trim().toLowerCase();
+
+    if (!trimmedName || !trimmedEmail) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({ message: 'Please enter a valid email address.' });
+    }
+
+    // Validate password strength (at least 12 characters)
+    if (typeof password !== 'string' || password.length < 12) {
+      return res.status(400).json({ message: 'Password must be at least 12 characters long.' });
+    }
+
+    // Check if email is already registered
+    const existingEmail = await User.findOne({ email: trimmedEmail });
+    if (existingEmail) {
+      return res.status(400).json({ message: 'Email already exists.' });
+    }
+
+    // Hash password with bcrypt
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Validate or compute administrator User ID
+    let finalUserId = userId ? String(userId).trim().toUpperCase() : '';
+    if (finalUserId && !/^A\d+$/.test(finalUserId)) {
+      return res.status(400).json({ message: 'Admin userId must start with A.' });
+    }
+
+    if (!finalUserId) {
+      finalUserId = await computeNextAdminId();
+    }
+
+    // Retry safely in case of concurrent creations causing duplicate userId
+    const MAX_RETRIES = 3;
+    let savedAdmin = null;
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      const existingUser = await User.findOne({ userId: finalUserId });
+      if (existingUser) {
+        finalUserId = await computeNextAdminId();
+      }
+
+      const newAdmin = new User({
+        userId: finalUserId,
+        name: trimmedName,
+        email: trimmedEmail,
+        password: hashedPassword,
+        role: 'admin', // Always assign admin role on backend
+        isActive: true,
+        isConsultant: false,
+        consultantType: '',
+        weeklyAvailability: [],
+      });
+
+      try {
+        savedAdmin = await newAdmin.save();
+        break;
+      } catch (saveError) {
+        if (saveError.code === 11000 && saveError.keyPattern && saveError.keyPattern.userId) {
+          finalUserId = await computeNextAdminId();
+          continue;
+        }
+        if (saveError.code === 11000 && saveError.keyPattern && saveError.keyPattern.email) {
+          return res.status(400).json({ message: 'Email already exists.' });
+        }
+        throw saveError;
+      }
+    }
+
+    if (!savedAdmin) {
+      return res.status(500).json({ message: 'Unable to create administrator account.' });
+    }
+
+    return res.status(201).json({
+      message: 'Admin account created successfully.',
+      user: {
+        userId: savedAdmin.userId,
+        name: savedAdmin.name,
+        email: savedAdmin.email,
+        role: savedAdmin.role,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 async function computeNextPatientId() {
   const patients = await User.find({ role: 'patient', userId: /^P\d+$/i }).select('userId');
   let highestNumber = 0;
@@ -573,6 +704,8 @@ module.exports = {
   updateDoctorStatus,
   getNextPatientId,
   getNextDoctorId,
+  getNextAdminId,
+  createAdmin,
   registerPatient,
 };
 

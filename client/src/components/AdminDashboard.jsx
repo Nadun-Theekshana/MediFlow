@@ -7,10 +7,8 @@ import { API_BASE_URL } from '../config/api';
 
 // AdminDashboard component: main admin interface
 export default function AdminDashboard({ user, onLogout }) {
-  // =========================================================
-  // STATE
-  // =========================================================
 
+  // STATE
   const [view, setView] = useState('dashboard');
 
   const [msg, setMsg] = useState('');
@@ -35,6 +33,15 @@ export default function AdminDashboard({ user, onLogout }) {
   const [patPassword, setPatPassword] = useState('1234');
   const [patLoading, setPatLoading] = useState(false);
 
+  // Admin form
+  const [adminId, setAdminId] = useState('');
+  const [adminIdLoading, setAdminIdLoading] = useState(false);
+  const [adminIdError, setAdminIdError] = useState('');
+  const [adminName, setAdminName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminLoading, setAdminLoading] = useState(false);
+
   // Doctor management state
   const [doctors, setDoctors] = useState([]);
   const [doctorsLoading, setDoctorsLoading] = useState(false);
@@ -43,13 +50,13 @@ export default function AdminDashboard({ user, onLogout }) {
   // Track which doctor's status is being updated
   const [statusUpdatingId, setStatusUpdatingId] = useState(null);
   const [doctorDeletingId, setDoctorDeletingId] = useState(null);
-// Patient management state
-const [patients, setPatients] = useState([]);
-const [patientsLoading, setPatientsLoading] = useState(false);
-const [patientsError, setPatientsError] = useState('');
-const [patientSearch, setPatientSearch] = useState('');
-const [patientPage, setPatientPage] = useState(1);
-const itemsPerPage = 7; // patients per page
+  // Patient management state
+  const [patients, setPatients] = useState([]);
+  const [patientsLoading, setPatientsLoading] = useState(false);
+  const [patientsError, setPatientsError] = useState('');
+  const [patientSearch, setPatientSearch] = useState('');
+  const [patientPage, setPatientPage] = useState(1);
+  const itemsPerPage = 7; // patients per page
   const [patientDeletingId, setPatientDeletingId] = useState(null);
 
   // Appointment management state
@@ -61,6 +68,7 @@ const itemsPerPage = 7; // patients per page
   const [appointmentLoading, setAppointmentLoading] = useState(false);
   const [appointmentError, setAppointmentError] = useState('');
   const [deletingAppointmentId, setDeletingAppointmentId] = useState(null);
+
   // Helper to treat undefined isActive as active
   // Reset patient page when search changes
   useEffect(() => {
@@ -70,9 +78,9 @@ const itemsPerPage = 7; // patients per page
 
   const token = sessionStorage.getItem('token');
 
-  // =========================================================
+
   // ROLE GUARD
-  // =========================================================
+
 
   if (!user || user.role !== 'admin') {
     return (
@@ -82,10 +90,8 @@ const itemsPerPage = 7; // patients per page
     );
   }
 
-  // =========================================================
-  // HELPERS
-  // =========================================================
 
+  // HELPERS
   const resetMsg = () => {
     setMsg('');
     setMsgType('');
@@ -188,6 +194,52 @@ const itemsPerPage = 7; // patients per page
     }
   };
 
+  const fetchNextAdminId = async () => {
+    setAdminIdLoading(true);
+    setAdminIdError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users/next-admin-id`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const errorMsg = data.message || 'Unable to load next Admin ID.';
+        setAdminIdError(errorMsg);
+        setMsg(errorMsg);
+        setMsgType('error');
+        setAdminId('');
+        return;
+      }
+      const data = await res.json();
+      if (data.nextAdminId) {
+        setAdminId(data.nextAdminId);
+      } else {
+        const errorMsg = 'Unable to generate next Admin ID.';
+        setAdminIdError(errorMsg);
+        setMsg(errorMsg);
+        setMsgType('error');
+        setAdminId('');
+      }
+    } catch (e) {
+      const errorMsg = 'Unable to connect to server to fetch Admin ID.';
+      setAdminIdError(errorMsg);
+      setMsg(errorMsg);
+      setMsgType('error');
+      setAdminId('');
+    } finally {
+      setAdminIdLoading(false);
+    }
+  };
+
   // Fetch data based on active view
   useEffect(() => {
     if (view === 'doctor') {
@@ -196,6 +248,9 @@ const itemsPerPage = 7; // patients per page
     } else if (view === 'patient') {
       setPatPassword('1234');
       fetchNextPatientId();
+    } else if (view === 'admin') {
+      setAdminPassword('');
+      fetchNextAdminId();
     } else if (view === 'doctorManagement') {
       const fetchDoctors = async () => {
         setDoctorsLoading(true);
@@ -305,10 +360,8 @@ const itemsPerPage = 7; // patients per page
     }
   }, [view]);
 
-  // =========================================================
+
   // EXISTING BACKEND REQUEST
-  // DO NOT CHANGE API
-  // =========================================================
 
   const apiRequest = async (payload, setLoading) => {
     resetMsg();
@@ -362,9 +415,8 @@ const itemsPerPage = 7; // patients per page
     }
   };
 
-  // =========================================================
+
   // ADD DOCTOR
-  // =========================================================
 
   const handleDoctorSubmit = async (e) => {
     e.preventDefault();
@@ -436,9 +488,8 @@ const itemsPerPage = 7; // patients per page
     }
   };
 
-  // =========================================================
+
   // ADD PATIENT
-  // =========================================================
 
   const handlePatientSubmit = async (e) => {
     e.preventDefault();
@@ -506,9 +557,114 @@ const itemsPerPage = 7; // patients per page
     }
   };
 
-  // =========================================================
+
+  // ADD ADMIN
+
+  const handleAdminSubmit = async (e) => {
+    e.preventDefault();
+
+    resetMsg();
+
+    if (adminIdLoading || !adminId) {
+      setMsg('Admin User ID is not available. Please wait or refresh.');
+      setMsgType('error');
+      return;
+    }
+
+    if (adminIdError) {
+      setMsg(adminIdError);
+      setMsgType('error');
+      return;
+    }
+
+    const aId = adminId.trim();
+    const aName = adminName.trim();
+    const aEmail = adminEmail.trim();
+    const aPassword = adminPassword;
+
+    if (!aId || !aName || !aEmail || !aPassword) {
+      setMsg('All fields are required.');
+      setMsgType('error');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(aEmail)) {
+      setMsg('Please enter a valid email address.');
+      setMsgType('error');
+      return;
+    }
+
+    if (aPassword.length < 12) {
+      setMsg('Password must be at least 12 characters long.');
+      setMsgType('error');
+      return;
+    }
+
+    if (!aId.startsWith('A')) {
+      setMsg('Admin User ID must start with "A".');
+      setMsgType('error');
+      return;
+    }
+
+    setAdminLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users/admin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: aId,
+          name: aName,
+          email: aEmail,
+          password: aPassword,
+        }),
+      });
+
+      if (res.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        onLogout();
+        return;
+      }
+
+      if (res.status === 403) {
+        setMsg('You are not authorized to perform this action.');
+        setMsgType('error');
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setMsg(data.message || 'Failed to create administrator account.');
+        setMsgType('error');
+        return;
+      }
+
+      const createdId = data.user?.userId || aId;
+      setAdminName('');
+      setAdminEmail('');
+      setAdminPassword('');
+
+      setMsg(`Administrator ${createdId} successfully created.`);
+      setMsgType('success');
+
+      fetchNextAdminId();
+    } catch (err) {
+      setMsg('Unable to connect to the server. Please try again.');
+      setMsgType('error');
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+
   // MEDIFLOW LOGO
-  // =========================================================
+
 
   const LogoIcon = () => (
     <svg
@@ -539,10 +695,8 @@ const itemsPerPage = 7; // patients per page
     </svg>
   );
 
-  // =========================================================
-  // ADMIN ICON
-  // =========================================================
 
+  // ADMIN ICON
   const AdministratorIcon = () => (
     <svg
       viewBox="0 0 64 64"
@@ -562,9 +716,8 @@ const itemsPerPage = 7; // patients per page
     </svg>
   );
 
-  // =========================================================
+
   // DOCTOR ICON
-  // =========================================================
 
   const DoctorIcon = () => (
     <svg
@@ -589,10 +742,8 @@ const itemsPerPage = 7; // patients per page
     </svg>
   );
 
-  // =========================================================
-  // PATIENT ICON
-  // =========================================================
 
+  // PATIENT ICON
   const PatientIcon = () => (
     <svg
       viewBox="0 0 64 64"
@@ -604,10 +755,8 @@ const itemsPerPage = 7; // patients per page
     </svg>
   );
 
-  // =========================================================
-  // ARROW ICON
-  // =========================================================
 
+  // ARROW ICON
   const ArrowIcon = () => (
     <svg
       viewBox="0 0 24 24"
@@ -617,9 +766,8 @@ const itemsPerPage = 7; // patients per page
     </svg>
   );
 
-  // =========================================================
+
   // DASHBOARD
-  // =========================================================
 
   const renderHome = () => (
     <section className="admin-home">
@@ -648,11 +796,11 @@ const itemsPerPage = 7; // patients per page
           </div>
 
           <h3>
-            Administrator Access
+            All Appointments
           </h3>
 
           <p>
-            Manage Doctor and Patient accounts.
+            View and manage all appointments.
           </p>
 
           <div className="admin-card-arrow">
@@ -720,10 +868,8 @@ const itemsPerPage = 7; // patients per page
     </section>
   );
 
-  // =========================================================
-  // ADD DOCTOR FORM
-  // =========================================================
 
+  // ADD DOCTOR FORM
   const renderDoctorForm = () => (
     <section className="admin-page-section">
       <div className="admin-section-heading">
@@ -860,9 +1006,8 @@ const itemsPerPage = 7; // patients per page
     </section>
   );
 
-  // =========================================================
+
   // ADD PATIENT FORM
-  // =========================================================
 
   const renderPatientForm = () => (
     <section className="admin-page-section">
@@ -960,9 +1105,108 @@ const itemsPerPage = 7; // patients per page
     </section>
   );
 
-  // =========================================================
+
+  // ADD ADMIN FORM
+
+  const renderAdminForm = () => (
+    <section className="admin-page-section">
+      <div className="admin-section-heading">
+        <p>ACCOUNT MANAGEMENT</p>
+
+        <h2>Add Admin</h2>
+
+        <span>
+          Create a new administrator account.
+        </span>
+      </div>
+
+      <form
+        className="admin-form"
+        onSubmit={handleAdminSubmit}
+      >
+        <div className="admin-form-group">
+          <label htmlFor="adminId">
+            Admin User ID
+          </label>
+
+          <input
+            id="adminId"
+            type="text"
+            value={adminIdLoading ? 'Loading...' : adminId}
+            readOnly
+            autoComplete="off"
+            placeholder="e.g. A001"
+            required
+          />
+        </div>
+
+        <div className="admin-form-group">
+          <label htmlFor="adminName">
+            Name
+          </label>
+
+          <input
+            id="adminName"
+            type="text"
+            value={adminName}
+            onChange={(e) =>
+              setAdminName(e.target.value)
+            }
+            placeholder="Admin name"
+            required
+          />
+        </div>
+
+        <div className="admin-form-group">
+          <label htmlFor="adminEmail">
+            Email
+          </label>
+
+          <input
+            id="adminEmail"
+            type="email"
+            value={adminEmail}
+            onChange={(e) =>
+              setAdminEmail(e.target.value)
+            }
+            placeholder="admin@example.com"
+            required
+          />
+        </div>
+
+        <div className="admin-form-group">
+          <label htmlFor="adminPassword">
+            Initial Password
+          </label>
+
+          <input
+            id="adminPassword"
+            type="password"
+            value={adminPassword}
+            onChange={(e) =>
+              setAdminPassword(e.target.value)
+            }
+            placeholder="Enter initial password (min. 12 characters)"
+            minLength={12}
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="admin-primary-btn"
+          disabled={adminLoading || adminIdLoading || !adminId || !!adminIdError}
+        >
+          {adminLoading
+            ? 'Adding...'
+            : 'Add Admin'}
+        </button>
+      </form>
+    </section>
+  );
+
+
   // ADMIN OVERVIEW
-  // =========================================================
 
   const renderAdminOverview = () => (
     <section className="admin-page-section">
@@ -1022,9 +1266,8 @@ const itemsPerPage = 7; // patients per page
     </section>
   );
 
-  // =========================================================
+
   // CONTENT
-  // =========================================================
 
   const renderDoctorManagement = () => {
     // Filter doctors based on search input
@@ -1037,245 +1280,245 @@ const itemsPerPage = 7; // patients per page
       );
     });
 
-  // Toggle doctor active status
-  const toggleStatus = async (doc) => {
-    const newStatus = !isDoctorActive(doc);
-    const userId = doc.userId;
-    if (!userId) {
-      setMsg('Unable to identify doctor account.');
-      setMsgType('error');
-      return;
-    }
-    const encodedId = encodeURIComponent(userId);
-    setStatusUpdatingId(userId);
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/users/doctors/${encodedId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ isActive: newStatus }),
-      });
-      if (res.status === 401) {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('user');
-        onLogout();
-        return;
-      }
-      if (res.status === 403) {
-        const data = await res.json();
-        setMsg(data.message || 'Forbidden');
+    // Toggle doctor active status
+    const toggleStatus = async (doc) => {
+      const newStatus = !isDoctorActive(doc);
+      const userId = doc.userId;
+      if (!userId) {
+        setMsg('Unable to identify doctor account.');
         setMsgType('error');
         return;
       }
-      if (res.status === 404) {
-        setMsg('Doctor account not found.');
+      const encodedId = encodeURIComponent(userId);
+      setStatusUpdatingId(userId);
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/users/doctors/${encodedId}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ isActive: newStatus }),
+        });
+        if (res.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          onLogout();
+          return;
+        }
+        if (res.status === 403) {
+          const data = await res.json();
+          setMsg(data.message || 'Forbidden');
+          setMsgType('error');
+          return;
+        }
+        if (res.status === 404) {
+          setMsg('Doctor account not found.');
+          setMsgType('error');
+          return;
+        }
+        if (res.status === 400) {
+          const data = await res.json();
+          setMsg(data.message || 'Invalid request');
+          setMsgType('error');
+          return;
+        }
+        if (!res.ok) {
+          setMsg('Unable to update Doctor account status.');
+          setMsgType('error');
+          return;
+        }
+        // Update UI
+        setDoctors((prev) =>
+          prev.map((d) => (d.userId === userId ? { ...d, isActive: newStatus } : d))
+        );
+      } catch (e) {
+        setMsg('Error updating doctor status');
         setMsgType('error');
-        return;
+      } finally {
+        setStatusUpdatingId(null);
       }
-      if (res.status === 400) {
-        const data = await res.json();
-        setMsg(data.message || 'Invalid request');
-        setMsgType('error');
-        return;
-      }
-      if (!res.ok) {
-        setMsg('Unable to update Doctor account status.');
-        setMsgType('error');
-        return;
-      }
-      // Update UI
-      setDoctors((prev) =>
-        prev.map((d) => (d.userId === userId ? { ...d, isActive: newStatus } : d))
+    };
+
+    // Delete doctor account
+    const handleDeleteDoctor = async (userId) => {
+      if (!userId) return;
+
+      const confirmed = window.confirm(
+        `Are you sure you want to permanently delete Doctor ${userId}?`
       );
-    } catch (e) {
-      setMsg('Error updating doctor status');
-      setMsgType('error');
-    } finally {
-      setStatusUpdatingId(null);
-    }
-  };
 
-  // Delete doctor account
-  const handleDeleteDoctor = async (userId) => {
-    if (!userId) return;
-
-    const confirmed = window.confirm(
-      `Are you sure you want to permanently delete Doctor ${userId}?`
-    );
-
-    if (confirmed === false) {
-      return;
-    }
-
-    setDoctorDeletingId(userId);
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (res.status === 200) {
-        setDoctors((currentDoctors) =>
-          currentDoctors.filter((doctor) => doctor.userId !== userId)
-        );
-        const data = await res.json().catch(() => ({}));
-        setMsg(data.message || 'Doctor account deleted successfully.');
-        setMsgType('success');
+      if (confirmed === false) {
         return;
       }
 
-      if (res.status === 401) {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('user');
-        onLogout();
-        return;
-      }
+      setDoctorDeletingId(userId);
 
-      if (res.status === 403) {
-        setMsg('You are not authorized to delete Doctor accounts.');
-        setMsgType('error');
-        return;
-      }
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      if (res.status === 404) {
-        const data = await res.json().catch(() => ({}));
-        setMsg(data.message || 'Doctor account not found.');
-        setMsgType('error');
-        return;
-      }
+        if (res.status === 200) {
+          setDoctors((currentDoctors) =>
+            currentDoctors.filter((doctor) => doctor.userId !== userId)
+          );
+          const data = await res.json().catch(() => ({}));
+          setMsg(data.message || 'Doctor account deleted successfully.');
+          setMsgType('success');
+          return;
+        }
 
-      if (res.status === 409) {
-        const data = await res.json().catch(() => ({}));
-        setMsg(
-          data.message ||
+        if (res.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          onLogout();
+          return;
+        }
+
+        if (res.status === 403) {
+          setMsg('You are not authorized to delete Doctor accounts.');
+          setMsgType('error');
+          return;
+        }
+
+        if (res.status === 404) {
+          const data = await res.json().catch(() => ({}));
+          setMsg(data.message || 'Doctor account not found.');
+          setMsgType('error');
+          return;
+        }
+
+        if (res.status === 409) {
+          const data = await res.json().catch(() => ({}));
+          setMsg(
+            data.message ||
             'This Doctor has existing appointments or prescriptions. Deactivate the account instead.'
-        );
+          );
+          setMsgType('error');
+          return;
+        }
+
+        setMsg('Unable to delete Doctor account.');
         setMsgType('error');
-        return;
+      } catch (e) {
+        setMsg('Unable to delete Doctor account.');
+        setMsgType('error');
+      } finally {
+        setDoctorDeletingId(null);
       }
+    };
 
-      setMsg('Unable to delete Doctor account.');
-      setMsgType('error');
-    } catch (e) {
-      setMsg('Unable to delete Doctor account.');
-      setMsgType('error');
-    } finally {
-      setDoctorDeletingId(null);
-    }
-  };
+    return (
+      <section className="admin-page-section doctor-management-page">
+        <div className="admin-section-heading">
+          <p>ACCOUNT MANAGEMENT</p>
+          <h2>Doctor Account Management</h2>
+          <span>Registered Doctor Accounts</span>
+        </div>
 
-      return (
-        <section className="admin-page-section doctor-management-page">
-          <div className="admin-section-heading">
-            <p>ACCOUNT MANAGEMENT</p>
-            <h2>Doctor Account Management</h2>
-            <span>Registered Doctor Accounts</span>
+        <div className="doctor-management-toolbar">
+          <button
+            type="button"
+            className="doctor-add-btn"
+            onClick={() => changeView('doctor')}
+          >
+            + Add Doctor
+          </button>
+          <div className="doctor-search-wrapper">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+            <input
+              type="text"
+              className="doctor-search-input"
+              placeholder="Search doctors..."
+              value={doctorSearch}
+              onChange={(e) => setDoctorSearch(e.target.value)}
+            />
           </div>
+        </div>
 
-          <div className="doctor-management-toolbar">
-            <button
-              type="button"
-              className="doctor-add-btn"
-              onClick={() => changeView('doctor')}
-            >
-              + Add Doctor
-            </button>
-            <div className="doctor-search-wrapper">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="11" cy="11" r="7" />
-                <path d="M20 20l-3.5-3.5" />
-              </svg>
-              <input
-                type="text"
-                className="doctor-search-input"
-                placeholder="Search doctors..."
-                value={doctorSearch}
-                onChange={(e) => setDoctorSearch(e.target.value)}
-              />
-            </div>
-          </div>
+        {doctorsLoading && <p className="admin-doctor-loading">Loading registered doctors...</p>}
+        {doctorsError && <p className="admin-doctor-error">{doctorsError}</p>}
+        {!doctorsLoading && !doctorsError && doctors.length === 0 && (
+          <p className="admin-doctor-empty">No Doctor accounts found.</p>
+        )}
 
-          {doctorsLoading && <p className="admin-doctor-loading">Loading registered doctors...</p>}
-          {doctorsError && <p className="admin-doctor-error">{doctorsError}</p>}
-          {!doctorsLoading && !doctorsError && doctors.length === 0 && (
-            <p className="admin-doctor-empty">No Doctor accounts found.</p>
-          )}
-
-          {!doctorsLoading && !doctorsError && filteredDoctors.length > 0 && (
-            <div className="doctor-table-card">
-              <div className="doctor-table-scroll">
-                <table className="doctor-management-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Doctor ID</th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Specialization</th>
-                      <th>Status</th>
-                      <th>Delete</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredDoctors.map((doctor, index) => {
-                      const doctorIsActive = doctor.isActive !== false;
-                      return (
-                        <tr key={doctor._id || doctor.userId}>
-                          <td>{index + 1}</td>
-                          <td>{doctor.userId}</td>
-                          <td>{doctor.name}</td>
-                          <td>{doctor.email}</td>
-                                                     <td>{doctor.specialization || 'Not specified'}</td>
-                          <td>
-                            <button
-                              type="button"
-                              className={`doctor-status-pill ${doctorIsActive ? 'is-active' : 'is-inactive'}`}
-                              onClick={() => toggleStatus(doctor)}
-                              disabled={statusUpdatingId === doctor.userId}
-                              title={doctorIsActive ? 'Click to deactivate Doctor' : 'Click to activate Doctor'}
-                            >
-                              <span className="doctor-status-dot"></span>
-                              {statusUpdatingId === doctor.userId
-                                ? 'Updating...'
-                                : doctorIsActive
+        {!doctorsLoading && !doctorsError && filteredDoctors.length > 0 && (
+          <div className="doctor-table-card">
+            <div className="doctor-table-scroll">
+              <table className="doctor-management-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Doctor ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Specialization</th>
+                    <th>Status</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDoctors.map((doctor, index) => {
+                    const doctorIsActive = doctor.isActive !== false;
+                    return (
+                      <tr key={doctor._id || doctor.userId}>
+                        <td>{index + 1}</td>
+                        <td>{doctor.userId}</td>
+                        <td>{doctor.name}</td>
+                        <td>{doctor.email}</td>
+                        <td>{doctor.specialization || 'Not specified'}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className={`doctor-status-pill ${doctorIsActive ? 'is-active' : 'is-inactive'}`}
+                            onClick={() => toggleStatus(doctor)}
+                            disabled={statusUpdatingId === doctor.userId}
+                            title={doctorIsActive ? 'Click to deactivate Doctor' : 'Click to activate Doctor'}
+                          >
+                            <span className="doctor-status-dot"></span>
+                            {statusUpdatingId === doctor.userId
+                              ? 'Updating...'
+                              : doctorIsActive
                                 ? 'Active'
                                 : 'Inactive'}
-                            </button>
-                          </td>
-                          <td>
-                            <button
-                              type="button"
-                              className="doctor-delete-btn"
-                              onClick={() =>
-                                handleDeleteDoctor(doctor.userId)
-                              }
-                              disabled={
-                                doctorDeletingId === doctor.userId
-                              }
-                            >
-                              {doctorDeletingId === doctor.userId
-                                ? 'Deleting...'
-                                : 'Delete'}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              <div className="doctor-table-footer">
-                Showing {filteredDoctors.length === 0 ? 0 : 1} to {filteredDoctors.length} of {filteredDoctors.length} doctors
-              </div>
+                          </button>
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            className="doctor-delete-btn"
+                            onClick={() =>
+                              handleDeleteDoctor(doctor.userId)
+                            }
+                            disabled={
+                              doctorDeletingId === doctor.userId
+                            }
+                          >
+                            {doctorDeletingId === doctor.userId
+                              ? 'Deleting...'
+                              : 'Delete'}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          )}
-        </section>
-      );
+            <div className="doctor-table-footer">
+              Showing {filteredDoctors.length === 0 ? 0 : 1} to {filteredDoctors.length} of {filteredDoctors.length} doctors
+            </div>
+          </div>
+        )}
+      </section>
+    );
   };
 
   // Delete patient account (only user record)
@@ -1521,10 +1764,10 @@ const itemsPerPage = 7; // patients per page
       const matchesSearch =
         !searchVal ||
         (a.patientUserId || '').toLowerCase().includes(searchVal) ||
-        (a.patientName  || '').toLowerCase().includes(searchVal) ||
+        (a.patientName || '').toLowerCase().includes(searchVal) ||
         (a.doctorUserId || '').toLowerCase().includes(searchVal) ||
-        (a.doctorName   || '').toLowerCase().includes(searchVal) ||
-        (a.reason       || '').toLowerCase().includes(searchVal);
+        (a.doctorName || '').toLowerCase().includes(searchVal) ||
+        (a.reason || '').toLowerCase().includes(searchVal);
 
       const matchesStatus =
         appointmentStatusFilter === 'all' ||
@@ -1533,12 +1776,12 @@ const itemsPerPage = 7; // patients per page
       return matchesSearch && matchesStatus;
     });
 
-    const totalPages  = Math.max(1, Math.ceil(filtered.length / APPT_PER_PAGE));
-    const safePage    = Math.min(appointmentPage, totalPages);
-    const startIndex  = (safePage - 1) * APPT_PER_PAGE;
-    const visible     = filtered.slice(startIndex, startIndex + APPT_PER_PAGE);
-    const showStart   = filtered.length === 0 ? 0 : startIndex + 1;
-    const showEnd     = Math.min(startIndex + APPT_PER_PAGE, filtered.length);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / APPT_PER_PAGE));
+    const safePage = Math.min(appointmentPage, totalPages);
+    const startIndex = (safePage - 1) * APPT_PER_PAGE;
+    const visible = filtered.slice(startIndex, startIndex + APPT_PER_PAGE);
+    const showStart = filtered.length === 0 ? 0 : startIndex + 1;
+    const showEnd = Math.min(startIndex + APPT_PER_PAGE, filtered.length);
 
     const handleAdminApproveAppointment = async (appointmentId) => {
       const confirmed = window.confirm('Approve this appointment request?');
@@ -1645,9 +1888,9 @@ const itemsPerPage = 7; // patients per page
 
     const renderStatusBadge = (status) => {
       const classMap = {
-        pending:   'aam-status aam-status-pending',
-        approved:  'aam-status aam-status-approved',
-        rejected:  'aam-status aam-status-rejected',
+        pending: 'aam-status aam-status-pending',
+        approved: 'aam-status aam-status-approved',
+        rejected: 'aam-status aam-status-rejected',
         cancelled: 'aam-status aam-status-cancelled',
       };
       const label = status
@@ -1663,7 +1906,7 @@ const itemsPerPage = 7; // patients per page
 
     const renderActionButton = (appt) => {
       const isApproving = approvingAppointmentId === appt._id;
-      const isDeleting  = deletingAppointmentId  === appt._id;
+      const isDeleting = deletingAppointmentId === appt._id;
 
       if (appt.status === 'pending') {
         return (
@@ -1852,6 +2095,9 @@ const itemsPerPage = 7; // patients per page
       case 'patient':
         return renderPatientForm();
 
+      case 'admin':
+        return renderAdminForm();
+
       case 'adminOverview':
         return renderAdminOverview();
 
@@ -1869,9 +2115,8 @@ const itemsPerPage = 7; // patients per page
     }
   };
 
-  // =========================================================
+
   // MAIN PAGE
-  // =========================================================
 
   return (
     <div className="admin-dashboard">
@@ -1932,6 +2177,20 @@ const itemsPerPage = 7; // patients per page
           >
             Add Patient
           </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              changeView('admin')
+            }
+            className={
+              view === 'admin'
+                ? 'admin-nav-btn active'
+                : 'admin-nav-btn'
+            }
+          >
+            Add Admin
+          </button>
         </nav>
 
         <button
@@ -1956,11 +2215,10 @@ const itemsPerPage = 7; // patients per page
       {/* CONTENT */}
 
       <main
-        className={`admin-content ${
-          view === 'doctorManagement' || view === 'doctor' || view === 'patientManagement' || view === 'appointmentManagement'
-            ? 'admin-content-scrollable'
-            : ''
-        }`}
+        className={`admin-content ${view === 'doctorManagement' || view === 'doctor' || view === 'patientManagement' || view === 'appointmentManagement' || view === 'admin'
+          ? 'admin-content-scrollable'
+          : ''
+          }`}
       >
         {renderContent()}
       </main>

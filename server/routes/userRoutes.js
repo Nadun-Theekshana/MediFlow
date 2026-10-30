@@ -1,8 +1,23 @@
 const express = require('express');
-const { createUser, getDoctors, getPatients, getAppointmentDoctors, getDoctorProfile, updateDoctorAvailability, deleteDoctor, deletePatient, updateDoctor, updateDoctorStatus, getNextPatientId, getNextDoctorId, registerPatient } = require('../controllers/userController');
+const {
+  createUser,
+  getDoctors,
+  getPatients,
+  getAppointmentDoctors,
+  getDoctorProfile,
+  updateDoctorAvailability,
+  deleteDoctor,
+  deletePatient,
+  updateDoctor,
+  updateDoctorStatus,
+  getNextPatientId,
+  getNextDoctorId,
+  getNextAdminId,
+  createAdmin,
+  registerPatient,
+} = require('../controllers/userController');
 const { protect, adminOnly, patientOnly, doctorOnly } = require('../middleware/authMiddleware');
 const router = express.Router();
-
 
 // Public routes (no auth required)
 router.get('/next-patient-id', getNextPatientId);
@@ -10,6 +25,9 @@ router.post('/register-patient', registerPatient);
 
 // Protected routes
 router.get('/next-doctor-id', protect, adminOnly, getNextDoctorId);
+router.get('/next-admin-id', protect, adminOnly, getNextAdminId);
+router.post('/admin', protect, adminOnly, createAdmin);
+router.post('/create-admin', protect, adminOnly, createAdmin);
 router.post('/', protect, adminOnly, createUser);
 router.get('/doctors', protect, adminOnly, getDoctors);
 router.get('/patients', protect, adminOnly, getPatients);
