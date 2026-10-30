@@ -1270,8 +1270,13 @@ export default function AdminDashboard({ user, onLogout }) {
   // CONTENT
 
   const renderDoctorManagement = () => {
+    // Sort doctors in ascending numerical order of Doctor ID
+    const sortedDoctors = [...doctors].sort((a, b) =>
+      (a.userId || '').localeCompare(b.userId || '', undefined, { numeric: true })
+    );
+
     // Filter doctors based on search input
-    const filteredDoctors = doctors.filter((doc) => {
+    const filteredDoctors = sortedDoctors.filter((doc) => {
       const search = doctorSearch.toLowerCase();
       return (
         doc.userId?.toLowerCase().includes(search) ||
