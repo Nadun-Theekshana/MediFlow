@@ -1,7 +1,7 @@
-/* Global reset */
 * {
   box-sizing: border-box;
 }
+
 html,
 body,
 #root {
@@ -10,12 +10,14 @@ body,
   width: 100%;
   min-height: 100%;
 }
+
 body {
   min-width: 320px;
   min-height: 100vh;
   font-family: Inter, "Segoe UI", Arial, sans-serif;
   background: #fff;
 }
+
 button,
 input,
 textarea {

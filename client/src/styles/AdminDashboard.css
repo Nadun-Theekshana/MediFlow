@@ -1,4 +1,3 @@
-/* src/styles/AdminDashboard.css */
 
 .admin-dashboard {
   width: 100%;
@@ -21,9 +20,6 @@
   box-sizing: border-box;
 }
 
-/* =========================================================
-   HEADER
-   ========================================================= */
 
 .admin-header {
   width: calc(100% - 68px);
@@ -40,9 +36,6 @@
 
 }
 
-/* =========================================================
-   BRAND
-   ========================================================= */
 
 .admin-brand {
   display: flex;
@@ -79,9 +72,7 @@
   color: #167df3;
 }
 
-/* =========================================================
-   NAV
-   ========================================================= */
+
 
 .admin-nav {
   height: 100%;
@@ -123,9 +114,6 @@
   background: #1684ff;
 }
 
-/* =========================================================
-   LOGOUT
-   ========================================================= */
 
 .admin-logout-btn {
   padding: 12px 25px;
@@ -144,9 +132,6 @@
     translateY(-1px);
 }
 
-/* =========================================================
-   MAIN
-   ========================================================= */
 
 .admin-content {
   width: 100%;
@@ -157,9 +142,6 @@
   overflow: auto;
 }
 
-/* =========================================================
-   HOME
-   ========================================================= */
 
 .admin-home {
   width: 100%;
@@ -172,9 +154,7 @@
   flex-direction: column;
 }
 
-/* =========================================================
-   WELCOME
-   ========================================================= */
+
 
 .admin-welcome {
   flex-shrink: 0;
@@ -208,9 +188,6 @@
   font-weight: 400;
 }
 
-/* =========================================================
-   CARD GRID
-   ========================================================= */
 
 .admin-card-grid {
   width: 100%;
@@ -228,9 +205,6 @@
   transform: translateY(-20px);
 }
 
-/* =========================================================
-   CARD
-   ========================================================= */
 
 .admin-management-card {
   width: 100%;
@@ -280,9 +254,7 @@
     0 15px 34px rgba(34, 79, 129, 0.13);
 }
 
-/* =========================================================
-   CARD ICON
-   ========================================================= */
+
 
 .admin-card-icon {
   width: 82px;
@@ -325,9 +297,6 @@
   stroke-linecap: round;
 }
 
-/* =========================================================
-   CARD TEXT
-   ========================================================= */
 
 .admin-management-card h3 {
   margin:
@@ -353,10 +322,6 @@
 
   line-height: 1.5;
 }
-
-/* =========================================================
-   CARD ARROW
-   ========================================================= */
 
 .admin-card-arrow {
   width: 45px;
@@ -395,9 +360,6 @@
   stroke-linejoin: round;
 }
 
-/* =========================================================
-   MESSAGE
-   ========================================================= */
 
 .admin-message {
   position: fixed;
@@ -445,9 +407,6 @@
     1px solid #ffc9c5;
 }
 
-/* =========================================================
-   INNER PAGES
-   ========================================================= */
 
 .admin-page-section {
   width:
@@ -489,9 +448,7 @@
   font-size: 14px;
 }
 
-/* =========================================================
-   FORM
-   ========================================================= */
+
 
 .admin-form {
   width:
@@ -559,7 +516,6 @@
     0 0 0 3px rgba(22, 121, 239, 0.11);
 }
 
-/* Search input */
 .admin-search-input {
   width: 100%;
   max-width: 300px;
@@ -578,7 +534,6 @@
   box-shadow: 0 0 0 3px rgba(22, 121, 239, 0.11);
 }
 
-/* Status badge */
 .status-badge {
   display: inline-block;
   padding: 2px 8px;
@@ -596,7 +551,6 @@
   background-color: #dc3545;
 }
 
-/* Action button */
 .admin-action-btn {
   padding: 6px 12px;
   border: none;
@@ -643,9 +597,6 @@
   cursor: not-allowed;
 }
 
-/* =========================================================
-   ADMIN OVERVIEW
-   ========================================================= */
 
 .admin-overview-card {
   display: grid;
@@ -751,9 +702,7 @@
   cursor: pointer;
 }
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
+
 
 .admin-footer {
   width: 100%;
@@ -775,9 +724,7 @@
   font-size: 13px;
 }
 
-/* =========================================================
-   UNAUTHORIZED
-   ========================================================= */
+
 
 .admin-unauthorized {
   width: 100%;
@@ -796,9 +743,6 @@
   color: #14284d;
 }
 
-/* =========================================================
-   LAPTOP HEIGHT
-   ========================================================= */
 
 @media (min-width: 1001px) and (max-height: 800px) {
 
@@ -917,9 +861,6 @@
   }
 }
 
-/* =========================================================
-   TABLET
-   ========================================================= */
 
 @media (max-width: 1000px) {
 
@@ -1015,9 +956,6 @@
   }
 }
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 600px) {
 
@@ -1116,15 +1054,7 @@
   }
 }
 
-/* =========================================================
-   DOCTOR ACCOUNT MANAGEMENT
-   SAMPLE 4 - TABLE WITH STATUS
-   Append this block at the END of AdminDashboard.css
-   ========================================================= */
 
-/* =========================================================
-   PAGE WIDTH
-   ========================================================= */
 
 .admin-page-section.doctor-management-page {
   width: min(1180px, 100%);
@@ -1132,15 +1062,13 @@
   margin: 0 auto;
 }
 
-/* =========================================================
-   PAGE HEADING
-   ========================================================= */
+
 
 .doctor-management-page .admin-section-heading {
   margin-bottom: 28px;
 }
 
-.doctor-management-page .admin-section-heading > p {
+.doctor-management-page .admin-section-heading>p {
   margin: 0 0 7px;
 
   color: #147cf3;
@@ -1177,9 +1105,7 @@
   font-weight: 400;
 }
 
-/* =========================================================
-   TOOLBAR
-   ========================================================= */
+
 
 .doctor-management-toolbar {
   width: 100%;
@@ -1193,9 +1119,7 @@
   margin-bottom: 14px;
 }
 
-/* =========================================================
-   ADD DOCTOR BUTTON
-   ========================================================= */
+
 
 .doctor-add-btn {
   min-width: 135px;
@@ -1212,11 +1136,9 @@
   border: none;
   border-radius: 8px;
 
-  background: linear-gradient(
-    135deg,
-    #1684ff 0%,
-    #0877ef 100%
-  );
+  background: linear-gradient(135deg,
+      #1684ff 0%,
+      #0877ef 100%);
 
   color: #ffffff;
 
@@ -1239,11 +1161,9 @@
 .doctor-add-btn:hover {
   transform: translateY(-1px);
 
-  background: linear-gradient(
-    135deg,
-    #087cf4 0%,
-    #056cdf 100%
-  );
+  background: linear-gradient(135deg,
+      #087cf4 0%,
+      #056cdf 100%);
 
   box-shadow:
     0 7px 18px rgba(22, 126, 243, 0.24);
@@ -1253,9 +1173,6 @@
   transform: translateY(0);
 }
 
-/* =========================================================
-   SEARCH BOX
-   ========================================================= */
 
 .doctor-search-wrapper {
   width: 360px;
@@ -1327,9 +1244,6 @@
   color: #8395b3;
 }
 
-/* =========================================================
-   TABLE CARD
-   ========================================================= */
 
 .doctor-table-card {
   width: 100%;
@@ -1352,9 +1266,6 @@
   overflow-x: auto;
 }
 
-/* =========================================================
-   TABLE
-   ========================================================= */
 
 .doctor-management-table {
   width: 100%;
@@ -1367,16 +1278,11 @@
   table-layout: auto;
 }
 
-/* =========================================================
-   TABLE HEADER
-   ========================================================= */
 
 .doctor-management-table thead {
-  background: linear-gradient(
-    90deg,
-    #eef7ff 0%,
-    #e6f2ff 100%
-  );
+  background: linear-gradient(90deg,
+      #eef7ff 0%,
+      #e6f2ff 100%);
 }
 
 .doctor-management-table thead tr {
@@ -1407,9 +1313,6 @@
     1px solid #d8e8f7;
 }
 
-/* =========================================================
-   TABLE BODY
-   ========================================================= */
 
 .doctor-management-table tbody tr {
   height: 58px;
@@ -1444,9 +1347,7 @@
   border-bottom: none;
 }
 
-/* =========================================================
-   COLUMN 1 - NUMBER
-   ========================================================= */
+
 
 .doctor-management-table th:nth-child(1),
 .doctor-management-table td:nth-child(1) {
@@ -1459,9 +1360,6 @@
   color: #7187a8;
 }
 
-/* =========================================================
-   COLUMN 2 - DOCTOR ID
-   ========================================================= */
 
 .doctor-management-table th:nth-child(2),
 .doctor-management-table td:nth-child(2) {
@@ -1474,9 +1372,7 @@
   font-weight: 700;
 }
 
-/* =========================================================
-   COLUMN 3 - NAME
-   ========================================================= */
+
 
 .doctor-management-table th:nth-child(3),
 .doctor-management-table td:nth-child(3) {
@@ -1489,27 +1385,19 @@
   font-weight: 500;
 }
 
-/* =========================================================
-   COLUMN 4 - EMAIL
-   ========================================================= */
 
 .doctor-management-table th:nth-child(4),
 .doctor-management-table td:nth-child(4) {
   min-width: 280px;
 }
 
-/* =========================================================
-   COLUMN 5 - ROLE
-   ========================================================= */
+
 
 .doctor-management-table th:nth-child(5),
 .doctor-management-table td:nth-child(5) {
   width: 150px;
 }
 
-/* =========================================================
-   COLUMN 6 - STATUS
-   ========================================================= */
 
 .doctor-management-table th:nth-child(6),
 .doctor-management-table td:nth-child(6) {
@@ -1517,10 +1405,6 @@
 
   text-align: center;
 }
-
-/* =========================================================
-   STATUS PILL
-   ========================================================= */
 
 .doctor-status-pill {
   min-width: 86px;
@@ -1553,9 +1437,6 @@
     background 0.16s ease;
 }
 
-/* =========================================================
-   ACTIVE STATUS
-   ========================================================= */
 
 .doctor-status-pill.is-active {
   color: #078447;
@@ -1574,9 +1455,6 @@
   transform: translateY(-1px);
 }
 
-/* =========================================================
-   INACTIVE STATUS
-   ========================================================= */
 
 .doctor-status-pill.is-inactive {
   color: #ef3f43;
@@ -1595,9 +1473,6 @@
   transform: translateY(-1px);
 }
 
-/* =========================================================
-   STATUS DOT
-   ========================================================= */
 
 .doctor-status-dot {
   width: 7px;
@@ -1608,19 +1483,14 @@
   border-radius: 50%;
 }
 
-.doctor-status-pill.is-active
-.doctor-status-dot {
+.doctor-status-pill.is-active .doctor-status-dot {
   background: #13ad61;
 }
 
-.doctor-status-pill.is-inactive
-.doctor-status-dot {
+.doctor-status-pill.is-inactive .doctor-status-dot {
   background: #ff4b50;
 }
 
-/* =========================================================
-   STATUS UPDATING
-   ========================================================= */
 
 .doctor-status-pill:disabled {
   opacity: 0.65;
@@ -1632,16 +1502,12 @@
   box-shadow: none;
 }
 
-/* =========================================================
-   EMPTY TABLE
-   ========================================================= */
 
 .doctor-empty-row {
   height: 90px !important;
 }
 
-.doctor-management-table
-.doctor-empty-row td {
+.doctor-management-table .doctor-empty-row td {
   text-align: center !important;
 
   color: #7185a4 !important;
@@ -1651,9 +1517,6 @@
   font-weight: 500 !important;
 }
 
-/* =========================================================
-   TABLE FOOTER
-   ========================================================= */
 
 .doctor-table-footer {
   width: 100%;
@@ -1679,9 +1542,6 @@
   font-weight: 400;
 }
 
-/* =========================================================
-   SCROLLBAR
-   ========================================================= */
 
 .doctor-table-scroll::-webkit-scrollbar {
   height: 7px;
@@ -1701,9 +1561,6 @@
   background: #a9c4df;
 }
 
-/* =========================================================
-   LAPTOP HEIGHT
-   ========================================================= */
 
 @media (min-width: 1001px) and (max-height: 800px) {
 
@@ -1711,18 +1568,15 @@
     max-width: 1080px;
   }
 
-  .doctor-management-page
-  .admin-section-heading {
+  .doctor-management-page .admin-section-heading {
     margin-bottom: 20px;
   }
 
-  .doctor-management-page
-  .admin-section-heading h2 {
+  .doctor-management-page .admin-section-heading h2 {
     font-size: 31px;
   }
 
-  .doctor-management-page
-  .admin-section-heading span {
+  .doctor-management-page .admin-section-heading span {
     font-size: 14px;
   }
 
@@ -1754,9 +1608,6 @@
   }
 }
 
-/* =========================================================
-   TABLET
-   ========================================================= */
 
 @media (max-width: 1000px) {
 
@@ -1774,24 +1625,18 @@
   }
 }
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 600px) {
 
-  .doctor-management-page
-  .admin-section-heading {
+  .doctor-management-page .admin-section-heading {
     margin-bottom: 22px;
   }
 
-  .doctor-management-page
-  .admin-section-heading h2 {
+  .doctor-management-page .admin-section-heading h2 {
     font-size: 28px;
   }
 
-  .doctor-management-page
-  .admin-section-heading span {
+  .doctor-management-page .admin-section-heading span {
     font-size: 14px;
   }
 
@@ -1822,10 +1667,7 @@
   }
 }
 
-/* =========================================================
-   ADD DOCTOR - CONSULTANT TYPE DROPDOWN
-   Match existing form inputs
-   ========================================================= */
+
 
 .admin-form-group select#doctor-specialization,
 .admin-form-group select[name="specialization"] {
@@ -1856,16 +1698,12 @@
   -moz-appearance: none !important;
 
   background-image:
-    linear-gradient(
-      45deg,
+    linear-gradient(45deg,
       transparent 50%,
-      #7085a5 50%
-    ),
-    linear-gradient(
-      135deg,
+      #7085a5 50%),
+    linear-gradient(135deg,
       #7085a5 50%,
-      transparent 50%
-    ) !important;
+      transparent 50%) !important;
 
   background-position:
     calc(100% - 19px) 21px,
@@ -1885,21 +1723,18 @@
     background-color 0.18s ease !important;
 }
 
-/* Placeholder / first option appearance */
 
 .admin-form-group select#doctor-specialization:invalid,
 .admin-form-group select[name="specialization"]:invalid {
   color: #7b8ba4 !important;
 }
 
-/* Hover */
 
 .admin-form-group select#doctor-specialization:hover,
 .admin-form-group select[name="specialization"]:hover {
   border-color: #b4c9e0 !important;
 }
 
-/* Focus - same style as existing text inputs */
 
 .admin-form-group select#doctor-specialization:focus,
 .admin-form-group select[name="specialization"]:focus {
@@ -1911,7 +1746,6 @@
   background-color: #ffffff !important;
 }
 
-/* Dropdown option appearance */
 
 .admin-form-group select#doctor-specialization option,
 .admin-form-group select[name="specialization"] option {
@@ -1922,16 +1756,12 @@
   font-size: 14px !important;
 }
 
-/* First disabled option */
 
 .admin-form-group select#doctor-specialization option[value=""],
 .admin-form-group select[name="specialization"] option[value=""] {
   color: #7b8ba4 !important;
 }
 
-/* =========================================================
-   DOCTOR ACCOUNT MANAGEMENT - DELETE
-   ========================================================= */
 
 .doctor-management-table th:nth-child(7),
 .doctor-management-table td:nth-child(7) {
@@ -1995,10 +1825,7 @@
   min-width: 980px;
 }
 
-/* =========================================================
-   ADMIN INNER PAGE VERTICAL SCROLL
-   Doctor Management + Add Doctor only
-   ========================================================= */
+
 
 .admin-content.admin-content-scrollable {
   min-height: 0;
@@ -2011,33 +1838,25 @@
 }
 
 
-/* Small bottom breathing room so content does not touch footer */
 
-.admin-content.admin-content-scrollable
-.admin-page-section {
+
+.admin-content.admin-content-scrollable .admin-page-section {
   padding-bottom: 28px;
 }
 
 
-/* Doctor Management should grow naturally with all rows */
 
-.admin-content.admin-content-scrollable
-.doctor-management-page {
+.admin-content.admin-content-scrollable .doctor-management-page {
   height: auto;
   min-height: min-content;
 }
 
 
-/* Keep horizontal table scrolling, but do NOT block page vertical scroll */
-
-.admin-content.admin-content-scrollable
-.doctor-table-scroll {
+.admin-content.admin-content-scrollable .doctor-table-scroll {
   overflow-x: auto;
   overflow-y: visible;
 }
 
-
-/* Optional clean scrollbar */
 
 .admin-content.admin-content-scrollable::-webkit-scrollbar {
   width: 8px;
@@ -2057,14 +1876,6 @@
 }
 
 
-/* =========================================================
-   PATIENT ACCOUNT MANAGEMENT
-   FINAL ISOLATED DESIGN
-   pam-* namespace
-   ========================================================= */
-
-
-/* PAGE */
 
 .admin-page-section.pam-page {
   width: min(1180px, calc(100% - 20px));
@@ -2073,11 +1884,6 @@
   padding-bottom: 32px;
   box-sizing: border-box;
 }
-
-
-/* =========================================================
-   HEADING
-   ========================================================= */
 
 .pam-heading {
   margin: 0 0 28px;
@@ -2111,10 +1917,6 @@
 }
 
 
-/* =========================================================
-   TOOLBAR
-   ========================================================= */
-
 .pam-toolbar {
   width: 100%;
   display: flex;
@@ -2126,7 +1928,6 @@
 }
 
 
-/* ADD PATIENT */
 
 .pam-add-button {
   min-width: 135px;
@@ -2162,10 +1963,6 @@
   transform: translateY(0);
 }
 
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
 
 .pam-search {
   width: 360px;
@@ -2237,9 +2034,7 @@
 }
 
 
-/* =========================================================
-   TABLE CARD
-   ========================================================= */
+
 
 .pam-table-card {
   width: 100%;
@@ -2256,11 +2051,6 @@
   overflow-x: auto;
   overflow-y: visible;
 }
-
-
-/* =========================================================
-   TABLE
-   ========================================================= */
 
 .pam-table {
   width: 100%;
@@ -2329,10 +2119,6 @@
 }
 
 
-/* =========================================================
-   TABLE COLUMNS
-   ========================================================= */
-
 .pam-table th:nth-child(1),
 .pam-table td:nth-child(1) {
   width: 55px;
@@ -2390,10 +2176,6 @@
 }
 
 
-/* =========================================================
-   STATUS
-   ========================================================= */
-
 .pam-status {
   min-width: 80px;
   height: 27px;
@@ -2440,10 +2222,6 @@
 }
 
 
-/* =========================================================
-   DELETE BUTTON
-   ========================================================= */
-
 .pam-delete-button {
   min-width: 72px;
   height: 30px;
@@ -2487,10 +2265,6 @@
 }
 
 
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
-
 .pam-empty {
   height: 82px;
   text-align: center !important;
@@ -2498,11 +2272,6 @@
   font-size: 14px !important;
   font-weight: 500 !important;
 }
-
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
 
 .pam-footer {
   width: 100%;
@@ -2525,10 +2294,6 @@
   font-weight: 400;
 }
 
-
-/* =========================================================
-   PAGINATION
-   ========================================================= */
 
 .pam-pagination {
   display: flex;
@@ -2578,9 +2343,6 @@
 }
 
 
-/* =========================================================
-   SCROLLBAR
-   ========================================================= */
 
 .pam-table-scroll::-webkit-scrollbar {
   height: 7px;
@@ -2599,10 +2361,6 @@
   background: #a9c4df;
 }
 
-
-/* =========================================================
-   LAPTOP HEIGHT
-   ========================================================= */
 
 @media (min-width: 1001px) and (max-height: 800px) {
 
@@ -2637,10 +2395,6 @@
 }
 
 
-/* =========================================================
-   TABLET
-   ========================================================= */
-
 @media (max-width: 1000px) {
 
   .admin-page-section.pam-page {
@@ -2657,10 +2411,6 @@
   }
 }
 
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 600px) {
 
@@ -2697,18 +2447,12 @@
   }
 }
 
-/* =========================================================
-   AAM — ADMIN APPOINTMENT MANAGEMENT
-   Isolated namespace: aam-*  (no globals)
-   ========================================================= */
-
 .aam-page {
   width: 100%;
   max-width: 1460px;
   margin: 0 auto;
 }
 
-/* Heading */
 .aam-eyebrow {
   margin: 0 0 4px;
   color: #1679ef;
@@ -2733,7 +2477,6 @@
   font-size: 14px;
 }
 
-/* Card wrapper */
 .aam-card {
   background: #ffffff;
   border: 1px solid #dce8f5;
@@ -2742,7 +2485,6 @@
   overflow: hidden;
 }
 
-/* Toolbar */
 .aam-toolbar {
   display: flex;
   align-items: center;
@@ -2753,7 +2495,6 @@
   flex-wrap: wrap;
 }
 
-/* Search wrapper */
 .aam-search {
   display: flex;
   align-items: center;
@@ -2792,7 +2533,6 @@
   color: #9bb1cc;
 }
 
-/* Status filter dropdown */
 .aam-filter {
   height: 38px;
   padding: 0 12px;
@@ -2812,7 +2552,6 @@
   box-shadow: 0 0 0 3px rgba(22, 121, 239, 0.1);
 }
 
-/* Loading / Error */
 .aam-loading,
 .aam-error {
   padding: 18px 22px;
@@ -2827,13 +2566,11 @@
   color: #b42318;
 }
 
-/* Table scroll wrapper */
 .aam-table-scroll {
   width: 100%;
   overflow-x: auto;
 }
 
-/* Table */
 .aam-table {
   width: 100%;
   min-width: 860px;
@@ -2881,7 +2618,6 @@
   text-overflow: ellipsis;
 }
 
-/* Empty state */
 .aam-empty {
   padding: 32px 14px !important;
   text-align: center;
@@ -2889,7 +2625,6 @@
   font-size: 14px;
 }
 
-/* ---- STATUS PILLS ---- */
 .aam-status {
   display: inline-flex;
   align-items: center;
@@ -2944,7 +2679,6 @@
   background: #687789;
 }
 
-/* ---- APPROVE BUTTON ---- */
 .aam-approve-button {
   min-width: 86px;
   height: 32px;
@@ -2980,7 +2714,6 @@
   box-shadow: none;
 }
 
-/* ---- FOOTER ---- */
 .aam-footer {
   display: flex;
   align-items: center;
@@ -2996,7 +2729,6 @@
   font-size: 13px;
 }
 
-/* ---- PAGINATION ---- */
 .aam-pagination {
   display: flex;
   align-items: center;
@@ -3040,7 +2772,7 @@
   color: #ffffff;
 }
 
-/* ---- DELETE BUTTON (cancelled appointments) ---- */
+
 .aam-delete-button {
   min-width: 86px;
   height: 32px;
@@ -3079,8 +2811,7 @@
   transform: translateY(-1px);
 
   box-shadow:
-    0 4px 10px
-    rgba(227, 61, 71, 0.10);
+    0 4px 10px rgba(227, 61, 71, 0.10);
 }
 
 .aam-delete-button:active:not(:disabled) {
